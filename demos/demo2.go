@@ -81,6 +81,6 @@ func main() {
 	} else if result == 0 || result == 1 {
 		fmt.Println("verify error!")
 	} else {
-		fmt.Printf("No.%d media cheat on %dth!", result, result1)
+		fmt.Printf("No.%d media cheat on %dth did!\n", -result, -result1)
 	}
 }

@@ -56,14 +56,12 @@ func main() {
 	// DSP conducts blinding operation.
 	randVal, M, _ = clt.Blind(seed, did)
 	fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v \n", 0, randVal, M, seed, did)
-	randVal1, _, _ := clt.Blind(seed, did1)
-	// If you want to test verifying operation, please comment out the next line.
 	randVal1, M1, _ := clt.Blind(seed, did1)
 	fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v \n", 1, randVal1, M1, seed, did1)
 
 	// Bytedance encrypts the received messages.
 	cipherBT1, _ := sevBT.Enc(M)
-	// If you want to test verifying operation, please comment out the next line.
+	// If you want to test verifying operation, please comment out the next line. 此处模拟字节发送了两个一模一样的密文
 	cipherBT2, _ := sevBT.Enc(M1)
 
 	// DSP unblinds the received ciphers.
@@ -73,11 +71,11 @@ func main() {
 
 	// 二选一
 	// Bytedance cheats on second cipher
-	/*cipheri=cipheri[0:0]
-	cipheri=append(cipheri,cipherBT1)
-	bt1,_:=clt.Unblind(randVal1,cipheri)
-	cipheri=cipheri[0:0]
-	cipheri=append(cipheri,cipherBT1+cipherBT1)*/
+	// cipheri = cipheri[0:0]
+	// cipheri = append(cipheri, cipherBT1)
+	// bt1, _ := clt.Unblind(randVal1, cipheri)
+	// cipheri = cipheri[0:0]
+	// cipheri = append(cipheri, cipherBT1+cipherBT1)
 	// No cheat!
 	cipheri = cipheri[0:0]
 	cipheri = append(cipheri, cipherBT2)
@@ -101,7 +99,7 @@ func main() {
 	} else if result == 0 || result == 1 {
 		fmt.Println("verify error!")
 	} else {
-		fmt.Printf("No.%d media cheat on %dth!", result, result1)
+		fmt.Printf("No.%d media cheat on %dth did!\n", -result, -result1)
 	}
 
 	storeFunc := func(dids []string, msgs []string) {

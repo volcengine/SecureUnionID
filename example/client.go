@@ -21,13 +21,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/volcengine/SecureUnionID/core"
 	"github.com/golang/protobuf/proto"
+	"github.com/volcengine/SecureUnionID/core"
 )
 
 var httpClient = &http.Client{Timeout: time.Duration(100 * time.Second)}
 
-func callSingleServerEnc(sender string, outId string,msgs []string, destination string) (signedMsgs []string, err error) {
+func callSingleServerEnc(sender string, outId string, msgs []string, destination string) (signedMsgs []string, err error) {
 	req := &SignRequest{Sender: &sender, OutId: &outId, BlindedMessages: msgs}
 	data, err := proto.Marshal(req)
 	if err != nil {
@@ -71,7 +71,7 @@ type StoreFunc func(dids []string, vals []string)
 	dids: the set of DIDs
 	storeFunc : store the mapping of DID and encrypted DID
 */
-func DoSignAndStoreJob(pki []core.Group, sender string, outId string,destination string, dids []string, storeFunc StoreFunc) {
+func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destination string, dids []string, storeFunc StoreFunc) {
 	// seed
 	seed, _ := core.SeedGen()
 	// random value
@@ -117,7 +117,7 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string,destination
 		fmt.Println("[Verify] Error!")
 		return
 	} else {
-		fmt.Printf("[Verify] Error , No.%d media cheat on %dth!", checkResult, r1)
+		fmt.Printf("[Verify] Error , No.%d media cheat on %dth did!", -checkResult, -r1)
 		return
 	}
 

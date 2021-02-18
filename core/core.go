@@ -319,7 +319,11 @@ func individual_verify(cipheri []string, pki []Group, did string, ranVal string,
 
 func (clt *PSIClient) Verify(cipheri []string, pki []Group, cipher []string, dids []string, ranVal []string) (int, int, error) {
 	result := batch_verify(cipher, dids, clt.sysPk)
-	if result != 1 {
+	if result == 0 {
+		return 0, 0, errors.New("Verify null pointer!\n")
+	} else if result == 1 {
+		return 1, 1, errors.New("Verify malloc error!\n")
+	} else if result == 3 {
 		stringChan := make(chan string)
 		result := make([]int, len(dids))
 		for i := 0; i < len(dids); i++ {
@@ -343,7 +347,7 @@ func (clt *PSIClient) Verify(cipheri []string, pki []Group, cipher []string, did
 			} else if result[i] == 0 {
 				return result[i], 0, errors.New("Verify null pointer!\n")
 			} else if result[i] < 0 {
-				return result[i], (-i), nil
+				return result[i], (-(i + 1)), nil
 			}
 		}
 	}
