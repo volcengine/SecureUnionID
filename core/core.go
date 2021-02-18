@@ -1,0 +1,377 @@
+// Copyright 2021 The SecureUnionID Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package core
+
+/*
+#include "../didlib/DID/encryption.c"
+#include "../didlib/BN254/ecp_BN254.c"
+#include "../didlib/BN254/ecp2_BN254.c"
+#include "../didlib/BN254/big_256_56.c"
+#include "../didlib/BN254/hash.c"
+#include "../didlib/BN254/fn_BN254.c"
+#include "../didlib/BN254/pair_BN254.c"
+#include "../didlib/BN254/fp12_BN254.c"
+#include "../didlib/BN254/fp_BN254.c"
+#include "../didlib/BN254/fp2_BN254.c"
+#include "../didlib/BN254/fp4_BN254.c"
+#include "../didlib/BN254/oct.c"
+#include "../didlib/BN254/rand.c"
+#include "../didlib/BN254/randapi.c"
+#include "../didlib/BN254/hkdf.c"
+#include "../didlib/BN254/rom_curve_BN254.c"
+#include "../didlib/BN254/rom_field_BN254.c"
+#include "../didlib/BN254/rom_order_BN254.c"
+*/
+import "C"
+import (
+	"bytes"
+	"encoding/binary"
+	"errors"
+	"os"
+	"unsafe"
+)
+
+const (
+	G1LENTH  = 33
+	G2LENTH  = 128
+	BIGLENTH = 32
+)
+
+//PSIClientHandler只针对特定dsp
+//每个dsp都自己生成一个client
+//每个媒体都会为每个dsp单独生成一个client
+type PSIClientHandler interface {
+	// client blinding H(did) * randVal
+	// [in]: seed       seed
+	//		 did        device ID
+	// [out]: the randVal used in blinding and the result of blinding
+	Blind(seed uint32, did string) (string, string, error)
+	// client unblinding, get Enc(sk, H(did))
+	// [in]: cipheri    the final cipher of did
+	//       randVal    the randVal used in blinding
+	// [out]: the final cipher
+	// Note: cipheri and randVal correspond one to one, please don't input wrong parameters
+	Unblind(randVal string, cipheri []string) (string, error)
+	// client verifying
+	// [in]: cipheri    the slice which consists of encrypted dids by different medias, here the cipher consists of
+	//                  multiple encrypted results of different dids, i.e., C(did)||C(did2)||...
+	//       pki        the public key of each media
+	//       cipher     the slice which consists of multiple final did ciphers
+	//       dids       the slice which consists of multiple dids
+	//       randVal    the slice which consists of multiple randVals
+	// [out]: whether there are media cheating or not
+	// Note: cipheri and pki correspond one to one, and they all bound with a certain DSP, please don't input wrong parameters.
+	// Note: dids and randVal correspond one to one, please don't input wrong parameters.
+	Verify(cipheri []string, pki []Group, cipher []string, dids []string, ranVal []string) (int, error)
+}
+
+type PSIServerHandler interface {
+	// server encrypt, get Enc(ski, H(did) *randVal)
+	// [in]: message     blinded did received from client
+	// [out]: the encrypted result of blinded did
+	Enc(message string) (string, error)
+}
+
+type PSIClient struct {
+	sysPk Group
+}
+
+type PSIServer struct {
+	sk [BIGLENTH]byte
+}
+
+type Group struct {
+	G1 string
+	G2 string
+}
+
+type KeysArray struct {
+	PK Group
+	SK [BIGLENTH]byte
+}
+
+func SeedGen() (uint32, error) {
+	var ran uint32
+	file, err := os.OpenFile("/dev/random", os.O_RDONLY, 0444)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+
+	buf := make([]byte, 4)
+	_, err = file.Read(buf)
+	if err != nil {
+		return 0, err
+	}
+	bytesBuffer := bytes.NewBuffer(buf)
+	err = binary.Read(bytesBuffer, binary.BigEndian, &ran)
+	if err != nil {
+		return 0, err
+	}
+	return ran, nil
+}
+
+// generate master key
+// [in]: seed,  the seed of random number
+// [out]: master key
+func MasterKeyGen(seed uint32) ([64]byte, error) {
+	var masterKey [64]byte
+	keyPtr := (*C.char)(unsafe.Pointer(&masterKey[0]))
+	result := C.MasterKeygen(C.ulong(seed), keyPtr)
+	if result != 2 {
+		return masterKey, errors.New("Set para null pointer!\n")
+	}
+	return masterKey, nil
+}
+
+// generate key pair for dspId
+// [in]: masterKey,  master key
+//       dspId,      the identity of dsp
+// [out]: key pair
+func Keygen(masterKey [64]byte, dspId string) (KeysArray, error) {
+	dspIdChar := C.CString(dspId)
+	defer C.free(unsafe.Pointer(dspIdChar))
+
+	pkG1Buffer := make([]byte, 2*G1LENTH+1)
+	pkG1Ptr := (*C.char)(unsafe.Pointer(&pkG1Buffer[0]))
+
+	pkG2Buffer := make([]byte, 2*G2LENTH+1)
+	pkG2Ptr := (*C.char)(unsafe.Pointer(&pkG2Buffer[0]))
+
+	skBuffer := make([]byte, BIGLENTH)
+	skPtr := (*C.char)(unsafe.Pointer(&skBuffer[0]))
+
+	keyPtr := (*C.char)(unsafe.Pointer(&masterKey[0]))
+
+	result := C.Keygen(keyPtr, dspIdChar, pkG1Ptr, pkG2Ptr, skPtr)
+	if result != 2 {
+		var sk [32]byte
+		return KeysArray{Group{"", ""}, sk}, errors.New("Genpara null pointer!\n")
+	}
+
+	var keys4DspId KeysArray
+	keys4DspId.PK.G1 = C.GoString(pkG1Ptr)
+	keys4DspId.PK.G2 = C.GoString(pkG2Ptr)
+	for i := 0; i < BIGLENTH; i++ {
+		keys4DspId.SK[i] = skBuffer[i]
+	}
+	return keys4DspId, nil
+}
+
+// generate system public key corresponding to dspId
+// [in]: pki    the slice consists of the public keys of all the medias corresponding to dspId
+// [out]: system public key
+func SystemKeygen(pki []Group) (Group, error) {
+	pkiG1Ptr := make([](*C.char), 0, len(pki))
+	pkiG2Ptr := make([](*C.char), 0, len(pki))
+	sysG1Buffer := make([]byte, 2*G1LENTH+1)
+	sysG2Buffer := make([]byte, 2*G2LENTH+1)
+	sysG1Ptr := (*C.char)(unsafe.Pointer(&sysG1Buffer[0]))
+	sysG2Ptr := (*C.char)(unsafe.Pointer(&sysG2Buffer[0]))
+	for i := 0; i < len(pki); i++ {
+		char1 := C.CString(pki[i].G1)
+		strptr1 := (*C.char)(unsafe.Pointer(char1))
+		pkiG1Ptr = append(pkiG1Ptr, strptr1)
+		defer C.free(unsafe.Pointer(char1))
+		char2 := C.CString(pki[i].G2)
+		strptr2 := (*C.char)(unsafe.Pointer(char2))
+		pkiG2Ptr = append(pkiG2Ptr, strptr2)
+		defer C.free(unsafe.Pointer(char2))
+	}
+
+	result := C.System_Keygen((**C.char)(unsafe.Pointer(&pkiG1Ptr[0])), (**C.char)(unsafe.Pointer(&pkiG2Ptr[0])), C.int(len(pki)), sysG1Ptr, sysG2Ptr)
+	if result == 0 {
+		return Group{"", ""}, errors.New("SystemKeygen null pointer!\n")
+	} else if result == 1 {
+		return Group{"", ""}, errors.New("SystemKeygen malloc error!\n")
+	}
+	var sysPk Group
+	sysPk.G1 = C.GoString(sysG1Ptr)
+	sysPk.G2 = C.GoString(sysG2Ptr)
+	return sysPk, nil
+}
+
+func HashToG1(did string) string {
+	var didHash string
+	didChar := C.CString(did)
+
+	hashBuffer := make([]byte, 2*G1LENTH+1)
+	hashPtr := (*C.char)(unsafe.Pointer(&hashBuffer[0]))
+
+	C.HASHIT(hashPtr, didChar)
+
+	didHash = C.GoString(hashPtr)
+	return didHash
+}
+
+func (clt *PSIClient) Blind(seed uint32, did string) (string, string, error) {
+	var randVal string
+	didChar := C.CString(did)
+	defer C.free(unsafe.Pointer(didChar))
+
+	randValBuffer := make([]byte, 2*BIGLENTH+1)
+	randValPtr := (*C.char)(unsafe.Pointer(&randValBuffer[0]))
+
+	cipherBuffer := make([]byte, 2*G1LENTH+1)
+	cipherPtr := (*C.char)(unsafe.Pointer(&cipherBuffer[0]))
+
+	result := C.Blinding(didChar, C.ulong(seed), randValPtr, cipherPtr)
+	if result != 2 {
+		return "", "", errors.New("Blinding null pointer!\n")
+	}
+
+	randVal = C.GoString(randValPtr)
+	cipher := C.GoString(cipherPtr)
+	return randVal, cipher, nil
+}
+
+func (clt *PSIClient) Unblind(randVal string, cipheri []string) (string, error) {
+	randValChar := C.CString(randVal)
+	defer C.free(unsafe.Pointer(randValChar))
+	sysPkG1Char := C.CString(clt.sysPk.G1)
+	defer C.free(unsafe.Pointer(sysPkG1Char))
+
+	cipheriPtr := make([](*C.char), 0, len(cipheri))
+	for i := 0; i < len(cipheri); i++ {
+		char := C.CString(cipheri[i])
+		defer C.free(unsafe.Pointer(char))
+		strptr := (*C.char)(unsafe.Pointer(char))
+		cipheriPtr = append(cipheriPtr, strptr)
+	}
+
+	cipherBuffer := make([]byte, 2*G1LENTH+1)
+	cipherPtr := (*C.char)(unsafe.Pointer(&cipherBuffer[0]))
+
+	result := C.Unblinding((**C.char)(unsafe.Pointer(&cipheriPtr[0])), C.int(len(cipheri)), randValChar, sysPkG1Char, cipherPtr)
+	if result == 0 {
+		return "", errors.New("Unblinding null pointer!\n")
+	} else if result == 1 {
+		return "", errors.New("Unblinding malloc error!\n")
+	}
+
+	cipher := C.GoString(cipherPtr)
+
+	return cipher, nil
+}
+
+func batch_verify(cipher []string, dids []string, sysPk Group) int {
+	cipherPtr := make([](*C.char), 0, len(dids))
+	didsPtr := make([](*C.char), 0, len(dids))
+	for i := 0; i < len(dids); i++ {
+		char1 := C.CString(cipher[i])
+		strptr1 := (*C.char)(unsafe.Pointer(char1))
+		cipherPtr = append(cipherPtr, strptr1)
+		defer C.free(unsafe.Pointer(char1))
+		char2 := C.CString(dids[i])
+		strptr2 := (*C.char)(unsafe.Pointer(char2))
+		didsPtr = append(didsPtr, strptr2)
+		defer C.free(unsafe.Pointer(char2))
+	}
+	sysPkG2Char := C.CString(sysPk.G2)
+	defer C.free(unsafe.Pointer(sysPkG2Char))
+
+	result := C.batch_verify((**C.char)(unsafe.Pointer(&cipherPtr[0])), (**C.char)(unsafe.Pointer(&didsPtr[0])), sysPkG2Char, C.int(len(dids)))
+
+	return int(result)
+}
+
+func individual_verify(cipheri []string, pki []Group, did string, ranVal string, result *int, stringChain chan string) {
+	cipheriPtr := make([](*C.char), 0, len(cipheri))
+	pkiG1sPtr := make([](*C.char), 0, len(cipheri))
+	pkiG2sPtr := make([](*C.char), 0, len(cipheri))
+	for i := 0; i < len(cipheri); i++ {
+		char1 := C.CString(cipheri[i])
+		strptr1 := (*C.char)(unsafe.Pointer(char1))
+		cipheriPtr = append(cipheriPtr, strptr1)
+		defer C.free(unsafe.Pointer(char1))
+		char2 := C.CString(pki[i].G1)
+		strptr2 := (*C.char)(unsafe.Pointer(char2))
+		pkiG1sPtr = append(pkiG1sPtr, strptr2)
+		defer C.free(unsafe.Pointer(char2))
+		char3 := C.CString(pki[i].G2)
+		strptr3 := (*C.char)(unsafe.Pointer(char3))
+		pkiG2sPtr = append(pkiG2sPtr, strptr3)
+		defer C.free(unsafe.Pointer(char3))
+	}
+
+	didChar := C.CString(did)
+	defer C.free(unsafe.Pointer(didChar))
+	ranValChar := C.CString(ranVal)
+	defer C.free(unsafe.Pointer(ranValChar))
+
+	record := C.verify_individual((**C.char)(unsafe.Pointer(&cipheriPtr[0])), (**C.char)(unsafe.Pointer(&pkiG1sPtr[0])), (**C.char)(unsafe.Pointer(&pkiG2sPtr[0])), didChar, C.int(len(cipheri)), ranValChar)
+
+	(*result) = int(record)
+	stringChain <- "done"
+}
+
+func (clt *PSIClient) Verify(cipheri []string, pki []Group, cipher []string, dids []string, ranVal []string) (int, int, error) {
+	result := batch_verify(cipher, dids, clt.sysPk)
+	if result != 1 {
+		stringChan := make(chan string)
+		result := make([]int, len(dids))
+		for i := 0; i < len(dids); i++ {
+			ciphertemp := make([]string, len(cipheri))
+			for j := 0; j < len(cipheri); j++ {
+				temp := cipheri[j][i*2*G1LENTH : (i+1)*2*G1LENTH]
+				ciphertemp[j] = temp
+			}
+			go individual_verify(ciphertemp, pki, dids[i], ranVal[i], &result[i], stringChan)
+		}
+		count := 0
+		for count < len(dids) {
+			value := <-stringChan
+			if value == "done" {
+				count++
+			}
+		}
+		for i := 0; i < len(dids); i++ {
+			if result[i] == 1 {
+				return result[i], 1, errors.New("Verify malloc error!\n")
+			} else if result[i] == 0 {
+				return result[i], 0, errors.New("Verify null pointer!\n")
+			} else if result[i] < 0 {
+				return result[i], (-i), nil
+			}
+		}
+	}
+	return 2, 2, nil
+}
+
+func (sev *PSIServer) Enc(message string) (string, error) {
+	if len(message) != 2*G1LENTH {
+		return "", errors.New("Wrong message format!\n")
+	}
+
+	messageChar := C.CString(message)
+	defer C.free(unsafe.Pointer(messageChar))
+
+	cipherBuffer := make([]byte, 2*G1LENTH+1)
+	cipherPtr := (*C.char)(unsafe.Pointer(&cipherBuffer[0]))
+
+	result := C.Enc((*C.char)(unsafe.Pointer(&sev.sk[0])), messageChar, cipherPtr)
+	if result != 2 {
+		return "", errors.New("Enc null pointer!\n")
+	}
+	return C.GoString(cipherPtr), nil
+}
+
+func NewClientFromInput(sysPk Group) PSIClient {
+	return PSIClient{sysPk}
+}
+
+func NewSeverFromInput(sk [BIGLENTH]byte) PSIServer {
+	return PSIServer{sk}
+}

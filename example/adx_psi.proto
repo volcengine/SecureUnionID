@@ -1,0 +1,45 @@
+package adx.psi;
+
+enum ResponseCode {
+	// 签名成功
+	Success = 0; 
+
+    // sender与outId不匹配, 认证失败
+    SenderOutIdMatchFailed = 100;
+
+	// 未找到DSP对应的的私钥
+	SkAuthenticationFailed = 101;
+
+	// 触达最大访问量, DSP应尽量将did与加密did落库
+	ThresholdReached = 102;
+
+    // server签名算法抛出异常
+    InnerAlgorithmFailed = 103;
+
+}
+
+message SignRequest {
+	// 发起签名的一方,能够标示DSP的Identity, 媒体侧需要这个参数找到DSP对应的私钥
+    required string sender = 1;
+
+    // dsp和对应媒体约定的outId
+    required string out_id = 2;
+
+    // DSP需要媒体签名的数据，这部分数据DSP已经盲化过
+    repeated string blinded_messages = 3;
+}
+
+message SignResponse {
+
+	// 标记媒体侧的Identity，方便DSP做正确性校验以及定位出有问题的媒体
+    required string receiver = 1;
+
+    // 媒体返回的状态码
+    required ResponseCode rsp_code = 2;
+
+    // 媒体基于当前receiver所使用密钥的版本
+    required string sk_version = 3;
+
+    // 媒体私钥签名后的数据，顺序与输入数据对齐。
+    repeated string signed_messages = 4;
+}

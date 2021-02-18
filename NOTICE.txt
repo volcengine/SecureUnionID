@@ -1,0 +1,5 @@
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Elliptic Curve Cryptography algorithm is based on Apache Milagro Crypto Libraries,
+Copyright 2016 The Apache Software Foundation.
