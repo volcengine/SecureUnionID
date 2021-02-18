@@ -41,4 +41,8 @@ Verify -     5071 iterations       1.97 ms per iteration
 
 ```
 
+**Doc**
+
+We provide an API document in [API](https://github.com/volcengine/SecureUnionID/blob/main/interface_benchmark.rst). Other contributors can develop interfaces in other languages according to this document.
+
 Released under the [Apache](https://github.com/volcengine/SecureUnionID/blob/main/LICENSE) License.
