@@ -426,7 +426,7 @@ int verify_individual(char **btistring, char **pkig1string, char **pkig2string, 
         PAIR_BN254_fexp(&e_did_pk);
         // if not equal, output the number of the cheating media.
         if (!FP12_BN254_equals(&e_did_pk, &e_bt_g2))
-            return (-i);
+            return (-(i+1));
     }
     free(bti);
     free(pki);
@@ -479,7 +479,9 @@ int batch_verify(char **btstring, char **did, char *sysg2string, int numofdid)
 
     free(hashdid);
     free(bt);
-    return FP12_BN254_equals(&e_did_pk, &e_bt_g2);
+    if(FP12_BN254_equals(&e_did_pk, &e_bt_g2))
+        return SUCCESS;
+    else return FAIL;
 }
 
 /* unblinding

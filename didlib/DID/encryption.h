@@ -28,6 +28,7 @@
 #define NULLPOINTER 0
 #define MALLOCERROR 1
 #define SUCCESS 2
+#define FAIL 3
 
 typedef struct{
     ECP_BN254 PK1;
