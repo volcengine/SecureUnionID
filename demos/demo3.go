@@ -54,8 +54,10 @@ func main() {
 	sevBT := core.NewSeverFromInput(keyPairBT.SK)
 
 	// DSP conducts blinding operation.
+	seed, _ = core.SeedGen()
 	randVal, M, _ = clt.Blind(seed, did)
 	fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v \n", 0, randVal, M, seed, did)
+	seed, _ = core.SeedGen()
 	randVal1, M1, _ := clt.Blind(seed, did1)
 	fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v \n", 1, randVal1, M1, seed, did1)
 
