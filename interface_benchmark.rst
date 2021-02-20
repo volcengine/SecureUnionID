@@ -141,7 +141,9 @@
             sevBT:=core.NewSeverFromInput(keyPairBT.SK)
 
             // DSP进行盲化操作
-            randVal,M,_=clt.Blind(seed,did)  
+            seed,_=core.SeedGen()
+            randVal,M,_=clt.Blind(seed,did)
+            seed,_=core.SeedGen()  
             randVal1,M1,_:=clt.Blind(seed,did1)
             
             // 字节方加密接收到的消息
@@ -383,15 +385,13 @@
           char cipherstring[2*G1LENTH+1],cipherstring1[2*G1LENTH+1];
           char cipher[2*G1LENTH+1],cipher1[2*G1LENTH+1];
           unsigned long ran = 0;
-          char *ranbyte=(char *)malloc(sizeof(ran));
           int fd,result;
 
           //生成随机数种子
-          if ((fd = open ("/dev/random", O_RDONLY)) > 0)
+          if ((fd = open("/dev/random", O_RDONLY)) > 0)
           {
-               read (fd, &ran, sizeof (ran));
+               read(fd, &ran, sizeof(ran));
           }
-          close (fd);
 
           //字节生成主密钥和公私钥对
           MasterKeygen(ran,masterkey);
@@ -403,8 +403,11 @@
           System_Keygen(pkig1string,pkig2string,1,sysg1string,sysg2string);
 
           //DSP进行盲化
-          Blinding(did,betastring,ran,Mstring);
-          Blinding(did1,betastring1,ran,Mstring1);
+          read(fd, &ran, sizeof(ran));
+          Blinding(did,ran,betastring,Mstring);
+          read(fd, &ran, sizeof(ran));
+          close(fd);
+          Blinding(did1,ran,betastring1,Mstring1);
 
           //字节加密
           Enc(skstring,Mstring,cipherstring);
