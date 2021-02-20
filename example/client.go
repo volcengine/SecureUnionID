@@ -109,7 +109,7 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 		concatVerify += bt
 	}
 
-	// step 4 : Verifying
+	// step 4 : Verifying, which can be ignored when there is only one media
 	checkResult, r1, _ := clt.Verify([]string{concatVerify}, pki, resBtAll, dids, randValAll)
 	if checkResult == 2 {
 		fmt.Println("[Verify] Successful!")
