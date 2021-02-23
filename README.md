@@ -9,7 +9,7 @@ go get -u github.com/volcengine/SecureUnionID
 
 **ABSTRACT**
 
-This project is used to protect device ID using Elliptic Curve Cryptography algorithm.
+This project is used to protect device ID using Elliptic Curve Cryptography algorithm. The details of this project can be found in [INTRODUCTION](https://github.com/volcengine/SecureUnionID/blob/main/doc/SecureUnionID_Intro).
 
 **RUN DEMOS**
 
@@ -43,6 +43,6 @@ Verify -     5071 iterations       1.97 ms per iteration
 
 **Doc**
 
-We provide an API document in [API](https://github.com/volcengine/SecureUnionID/blob/main/interface_benchmark.rst). Other contributors can develop interfaces in other languages according to this document.
+We provide an API document in [API_CN](https://github.com/volcengine/SecureUnionID/blob/main/doc/interface_benchmark_cn.rst) (English version in [API_EN](https://github.com/volcengine/SecureUnionID/blob/main/doc/interface_benchmark_en.rst)). Other contributors can develop interfaces in other languages according to this document.
 
 Released under the [Apache](https://github.com/volcengine/SecureUnionID/blob/main/LICENSE) License.
