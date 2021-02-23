@@ -47,6 +47,23 @@ func StringToSk(skStr string) (sk [core.BIGLENTH]byte,err error) {
 	return sk, nil
 }
 
+func DoEncryption(dids []string, skStr string) (vals []string,err error) {
+	ski, err := StringToSk(skStr)
+	if err != nil {
+		return nil, err
+	}
+	vals = make([]string, 0, len(dids))
+	server := core.NewSeverFromInput(ski)
+	for _, did := range dids {
+		hashdid := core.HashToG1(did)
+		encDid, err := server.Enc(hashdid)
+		if err != nil {
+			return nil, err
+		}
+		vals = append(vals, encDid)
+	}
+	return vals, nil
+}
 
 func InitServer(receiver string, skStr string,skv string) {
 	serverIdentity = receiver

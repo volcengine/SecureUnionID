@@ -15,22 +15,9 @@
 package main
 
 import (
-	"github.com/volcengine/SecureUnionID/core"
-	"github.com/volcengine/SecureUnionID/example"
 	"fmt"
+	"github.com/volcengine/SecureUnionID/example"
 )
-
-func DoEncryption(dids []string, skStr string) (vals []string) {
-	vals = make([]string, 0, len(dids))
-	ski, _ := example.StringToSk(skStr)
-	server := core.NewSeverFromInput(ski)
-	for _, did := range dids {
-		hashdid := core.HashToG1(did)
-		encDid, _ := server.Enc(hashdid)
-		vals = append(vals, encDid)
-	}
-	return vals
-}
 
 func main() {
 	dids := []string{
@@ -38,7 +25,7 @@ func main() {
 		"123456789054321",
 	}
 	skStr := "pcl3fdcZy9FxDfBGk64B8fPlDEpIRtiz17ZhkW3Kgug="
-	encDids := DoEncryption(dids, skStr)
+	encDids, _ := example.DoEncryption(dids, skStr)
 	for i := range dids {
 		fmt.Printf("[online req] did:%v enc_did:%v \n", dids[i], encDids[i])
 	}
