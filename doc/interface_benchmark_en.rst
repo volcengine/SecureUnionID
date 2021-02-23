@@ -283,7 +283,7 @@ In order to facilitate the secondary development of other language interfaces, t
 
      Error return: success or "parameter null pointer" error or "allocation space" error
 
-- **盲化**
+- **Blinding**
      **Blinding(did, seed, betastring, Mstring)**
 
      This interface is used to generate random numbers for blinding and the blinded did.
