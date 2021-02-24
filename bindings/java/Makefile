@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -fPIC
 SWIG = swig
 SWIG_FLAGS = -java
-SWIG_INTERFACE_NAME = secureunionid
+SWIG_INTERFACE_NAME = SecureUnionID
 SWIG_FILE = $(SWIG_INTERFACE_NAME).i
 SWIG_WRAP_NAME = $(SWIG_INTERFACE_NAME)_wrap
 
@@ -33,7 +33,7 @@ OBJS += $(CORE_SRCS:$(CORE_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS += $(OBJ_DIR)/$(SWIG_WRAP_NAME).o
 
 all: $(OBJS)
-	$(CC) -shared -o libsecureunionid.so $^ $(CFLAGS)
+	$(CC) -shared -o lib$(SWIG_INTERFACE_NAME).so $^ $(CFLAGS)
 
 $(OBJ_DIR)/%.o: $(ECC_DIR)/%.c $(OBJ_DIR)
 	$(CC) -c $< -o $@  $(CFLAGS)
@@ -46,7 +46,7 @@ $(OBJ_DIR):
 	mkdir objs
 
 clean:
-	rm secureunionid*.java *.c *.so *.class
+	rm $(SWIG_INTERFACE_NAME)*.java *.c *.so *.class
 	rm -rf $(OBJ_DIR)
 
 $(SWIG_WRAP_NAME).c: $(SWIG_FILE)
