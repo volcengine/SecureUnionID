@@ -6,6 +6,8 @@ SWIG_INTERFACE_NAME = SecureUnionID
 SWIG_FILE = $(SWIG_INTERFACE_NAME).i
 SWIG_WRAP_NAME = $(SWIG_INTERFACE_NAME)_wrap
 
+MAC_OS_LDFLAGS = -dynamiclib -undefined suppress -flat_namespace
+
 UNAME_S := $(shell uname)
 ifeq ($(UNAME_S),Linux)
 # jni.h path
@@ -33,7 +35,13 @@ OBJS += $(CORE_SRCS:$(CORE_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS += $(OBJ_DIR)/$(SWIG_WRAP_NAME).o
 
 all: $(OBJS)
+ifeq ($(UNAME_S),Linux)
 	$(CC) -shared -o lib$(SWIG_INTERFACE_NAME).so $^ $(CFLAGS)
+endif
+ifeq ($(UNAME_S),Darwin)
+	$(CC) $(MAC_OS_LDFLAGS) -o lib$(SWIG_INTERFACE_NAME).dylib $^ $(CFLAGS)
+endif
+
 
 $(OBJ_DIR)/%.o: $(ECC_DIR)/%.c $(OBJ_DIR)
 	$(CC) -c $< -o $@  $(CFLAGS)
@@ -46,7 +54,7 @@ $(OBJ_DIR):
 	mkdir objs
 
 clean:
-	rm $(SWIG_INTERFACE_NAME)*.java *.c *.so *.class
+	rm -f $(SWIG_INTERFACE_NAME)*.java *.c *.so *.class *.dylib
 	rm -rf $(OBJ_DIR)
 
 $(SWIG_WRAP_NAME).c: $(SWIG_FILE)
@@ -55,7 +63,6 @@ $(SWIG_WRAP_NAME).c: $(SWIG_FILE)
 
 $(OBJ_DIR)/$(SWIG_WRAP_NAME).o: $(SWIG_WRAP_NAME).c
 	gcc -c $(SWIG_WRAP_NAME).c -fPIC $(JNI_CFLAG) -o $(OBJ_DIR)/$(SWIG_WRAP_NAME).o
-
 
 build:
 	javac *.java
