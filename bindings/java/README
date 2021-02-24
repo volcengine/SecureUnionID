@@ -1,4 +1,4 @@
-This is the java bindings (It could run now, but the result is not right yet)
+This is the java bindings.
 
 Run the following command:
 
@@ -9,4 +9,4 @@ It will use swig to generate the wrap files and then use gcc to compile the libs
 It will use java command to build the java classes
 
 `make run`
-It will run the demoo
+It will run the demo.
