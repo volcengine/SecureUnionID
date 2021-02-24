@@ -122,56 +122,56 @@
 
       func main() {
             var dspID,did,did1,randVal,M,bt string
-            dspID="1234567890"
-            did="123456789012345"
-            did1="123456789054321"
+            dspID = "1234567890"
+            did = "123456789012345"
+            did1 = "123456789054321"
 
             //字节方生成密钥
-            seed,_:=core.SeedGen()
-            masterKeyBT,_:=core.MasterKeyGen(seed)
-            keyPairBT,_:=core.Keygen(masterKeyBT,dspID)
+            seed,_ := core.SeedGen()
+            masterKeyBT,_ := core.MasterKeyGen(seed)
+            keyPairBT,_ := core.Keygen(masterKeyBT,dspID)
 
             // DSP生成系统密钥
             var pki []core.Group
-            pki=append(pki,keyPairBT.PK)
-            sysPk,_:=core.SystemKeygen(pki)
+            pki = append(pki,keyPairBT.PK)
+            sysPk,_ := core.SystemKeygen(pki)
 
             // 生成客户端和服务端的实例
-            clt:=core.NewClientFromInput(sysPk)
-            sevBT:=core.NewSeverFromInput(keyPairBT.SK)
+            clt := core.NewClientFromInput(sysPk)
+            sevBT := core.NewSeverFromInput(keyPairBT.SK)
 
             // DSP进行盲化操作
-            seed,_=core.SeedGen()
-            randVal,M,_=clt.Blind(seed,did)
-            seed,_=core.SeedGen()  
-            randVal1,M1,_:=clt.Blind(seed,did1)
+            seed,_ = core.SeedGen()
+            randVal,M,_ = clt.Blind(seed,did)
+            seed,_ = core.SeedGen()  
+            randVal1,M1,_ := clt.Blind(seed,did1)
             
             // 字节方加密接收到的消息
-            cipherBT1,_:=sevBT.Enc(M)
-            cipherBT2,_:=sevBT.Enc(M1)
+            cipherBT1,_ := sevBT.Enc(M)
+            cipherBT2,_ := sevBT.Enc(M1)
 
             // DSP解盲
             var cipheri []string
-            cipheri=append(cipheri,cipherBT1)
-            bt,_=clt.Unblind(randVal,cipheri)
-            cipheri=cipheri[0:0]
-            cipheri=append(cipheri,cipherBT2)
-            bt1,_:=clt.Unblind(randVal1,cipheri)
+            cipheri = append(cipheri,cipherBT1)
+            bt,_ = clt.Unblind(randVal,cipheri)
+            cipheri = cipheri[0:0]
+            cipheri = append(cipheri,cipherBT2)
+            bt1,_ := clt.Unblind(randVal1,cipheri)
             
-            cipheri=cipheri[0:0]
-            cipheri=append(cipheri,cipherBT1+cipherBT2)
+            cipheri = cipheri[0:0]
+            cipheri = append(cipheri,cipherBT1+cipherBT2)
 
             // 验证
             var cipher []string
-            cipher=append(cipher,bt)
-            cipher=append(cipher,bt1)
+            cipher = append(cipher,bt)
+            cipher = append(cipher,bt1)
             var dids []string
-            dids=append(dids,did)
-            dids=append(dids,did1)
+            dids = append(dids,did)
+            dids = append(dids,did1)
             var randVals []string
-            randVals=append(randVals,randVal)
-            randVals=append(randVals,randVal1)
-            result,result1,_:=clt.Verify(cipheri,pki,cipher,dids,randVals)
+            randVals = append(randVals,randVal)
+            randVals = append(randVals,randVal1)
+            result,result1,_ := clt.Verify(cipheri,pki,cipher,dids,randVals)
             if result == 2 {
                   fmt.Println("no one cheat!")
             } else if result == 0 || result == 1 {
@@ -370,9 +370,9 @@
       // 本样例模拟字节和一个DSP所进行的流程，DSP为客户端也即发起端，负责加盲去盲和验证
       // 字节为服务端，负责加密
      int main(){
-          char did[16]="123456789012345";
-          char did1[16]="123456789054321";
-          char dspID[11]="1234567890";
+          char did[16] = "123456789012345";
+          char did1[16] = "123456789054321";
+          char dspID[11] = "1234567890";
           char pkg1string[2*G1LENTH+1];
           char pkg2string[2*G2LENTH+1];
           char sysg1string[2*G1LENTH+1];
@@ -398,8 +398,8 @@
           Keygen(masterkey,dspID,pkg1string,pkg2string,skstring);
 
           //DSP生成系统参数
-          pkig1string[0]=pkg1string;
-          pkig2string[0]=pkg2string;
+          pkig1string[0] = pkg1string;
+          pkig2string[0] = pkg2string;
           System_Keygen(pkig1string,pkig2string,1,sysg1string,sysg2string);
 
           //DSP进行盲化
@@ -414,25 +414,25 @@
           Enc(skstring,Mstring1,cipherstring1);
 
           //DSP进行去盲化
-          cipherstrings[0]=cipherstring;
+          cipherstrings[0] = cipherstring;
           Unblinding(cipherstrings,1,betastring,sysg1string,cipher);
-          cipherstrings[0]=cipherstring1;
+          cipherstrings[0] = cipherstring1;
           Unblinding(cipherstrings,1,betastring1,sysg1string,cipher1);
 
-          ciphers[0]=cipher;
-          ciphers[1]=cipher1;
-          dids[0]=did;
-          dids[1]=did1;
+          ciphers[0] = cipher;
+          ciphers[1] = cipher1;
+          dids[0] = did;
+          dids[1] = did1;
 
           //验证
-          if(batch_verify(ciphers,dids,sysg2string,2)!=SUCCESS){
-               cipherstrings[0]=cipherstring;
-               result=verify_individual(cipherstrings,pkig1string,pkig2string,did,1,betastring);
+          if(batch_verify(ciphers,dids,sysg2string,2) != SUCCESS){
+               cipherstrings[0] = cipherstring;
+               result = verify_individual(cipherstrings,pkig1string,pkig2string,did,1,betastring);
                if(result<0)
                     printf("No.%d media cheat on 1th did!\n",-result);
 
-               cipherstrings[0]=cipherstring1;
-               result=verify_individual(cipherstrings,pkig1string,pkig2string,did1,1,betastring1);
+               cipherstrings[0] = cipherstring1;
+               result = verify_individual(cipherstrings,pkig1string,pkig2string,did1,1,betastring1);
                if(result<0)
                     printf("No.%d media cheat on 2th did!\n",-result);
           }

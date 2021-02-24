@@ -17,15 +17,17 @@ package example
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/golang/protobuf/proto"
-	"github.com/volcengine/SecureUnionID/core"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/volcengine/SecureUnionID/bindings/go/core"
 )
+
 var (
 	serverIdentity string
 	skVersion      string
-	sk [core.BIGLENTH]byte
+	sk             [core.BIGLENTH]byte
 )
 
 func SkToString(sk [core.BIGLENTH]byte) string {
@@ -36,7 +38,7 @@ func SkToString(sk [core.BIGLENTH]byte) string {
 	return base64.StdEncoding.EncodeToString(tmp)
 }
 
-func StringToSk(skStr string) (sk [core.BIGLENTH]byte,err error) {
+func StringToSk(skStr string) (sk [core.BIGLENTH]byte, err error) {
 	b, err := base64.StdEncoding.DecodeString(skStr)
 	if err != nil {
 		return sk, err
@@ -47,7 +49,7 @@ func StringToSk(skStr string) (sk [core.BIGLENTH]byte,err error) {
 	return sk, nil
 }
 
-func DoEncryption(dids []string, skStr string) (vals []string,err error) {
+func DoEncryption(dids []string, skStr string) (vals []string, err error) {
 	ski, err := StringToSk(skStr)
 	if err != nil {
 		return nil, err
@@ -65,7 +67,7 @@ func DoEncryption(dids []string, skStr string) (vals []string,err error) {
 	return vals, nil
 }
 
-func InitServer(receiver string, skStr string,skv string) {
+func InitServer(receiver string, skStr string, skv string) {
 	serverIdentity = receiver
 	skVersion = skv
 	skData, err := StringToSk(skStr)
@@ -77,7 +79,7 @@ func InitServer(receiver string, skStr string,skv string) {
 	}
 }
 
-func psiEccEncode(ski [core.BIGLENTH]byte,msgs []string)(encodedMsgs []string, err error) {
+func psiEccEncode(ski [core.BIGLENTH]byte, msgs []string) (encodedMsgs []string, err error) {
 	server := core.NewSeverFromInput(ski)
 	for _, msg := range msgs {
 		resMsg, err := server.Enc(msg)
@@ -119,13 +121,8 @@ func serverEncode(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("dsp: ", signReq.GetSender(), " called, server success return")
 }
 
-
 func StartServer() {
 	fmt.Println("Start Server")
 	http.HandleFunc("/encryption", serverEncode)
 	http.ListenAndServe(":8008", nil)
 }
-
-
-
-
