@@ -16,35 +16,36 @@ package main
 
 import (
 	"fmt"
-	"github.com/volcengine/SecureUnionID/core"
 	"time"
+
+	"github.com/volcengine/SecureUnionID/bindings/go/core"
 )
 
-const(
-	MIN_TIME int = 10
-	MIN_ITERS int = 10
+const (
+	MIN_TIME   int = 10
+	MIN_ITERS  int = 10
 	NUMOFMEDIA int = 1
-	NUMOFDID int = 300
+	NUMOFDID   int = 300
 )
 
 func main() {
-	var dspID,did,randVal,M,bt,cipheri string
+	var dspID, did, randVal, M, bt, cipheri string
 	var masterKey [64]byte
 	var keyPair core.KeysArray
 	var sysPk core.Group
-	dspID="1234567890"
-	did="123456789012345"
+	dspID = "1234567890"
+	did = "123456789012345"
 	var KeyPairs []core.KeysArray
 	var masterKeys [][64]byte
 
-	for i:=0;i<NUMOFMEDIA;i++{
-		if i==0{
+	for i := 0; i < NUMOFMEDIA; i++ {
+		if i == 0 {
 			start := time.Now()
 			iterations := 0
-			elapsed:=time.Since(start)
+			elapsed := time.Since(start)
 			for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-				seed,_:=core.SeedGen()
-				masterKey,_=core.MasterKeyGen(seed)
+				seed, _ := core.SeedGen()
+				masterKey, _ = core.MasterKeyGen(seed)
 				iterations++
 				elapsed = time.Since(start)
 			}
@@ -53,10 +54,10 @@ func main() {
 			fmt.Printf(" %8.2f ms per iteration\n", dur)
 
 			start = time.Now()
-			iterations=0
-			elapsed=time.Since(start)
+			iterations = 0
+			elapsed = time.Since(start)
 			for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-				keyPair,_ = core.Keygen(masterKey,dspID)
+				keyPair, _ = core.Keygen(masterKey, dspID)
 				iterations++
 				elapsed = time.Since(start)
 			}
@@ -64,27 +65,27 @@ func main() {
 			fmt.Printf("KeyGen - %8d iterations  ", iterations)
 			fmt.Printf(" %8.2f ms per iteration\n", dur)
 
-			masterKeys=append(masterKeys,masterKey)
-			KeyPairs=append(KeyPairs,keyPair)
-		} else{
-			seed,_:=core.SeedGen()
-			masterKey,_:=core.MasterKeyGen(seed)
-			keyPair,_:=core.Keygen(masterKey,dspID)
-			masterKeys=append(masterKeys,masterKey)
-			KeyPairs=append(KeyPairs,keyPair)
+			masterKeys = append(masterKeys, masterKey)
+			KeyPairs = append(KeyPairs, keyPair)
+		} else {
+			seed, _ := core.SeedGen()
+			masterKey, _ := core.MasterKeyGen(seed)
+			keyPair, _ := core.Keygen(masterKey, dspID)
+			masterKeys = append(masterKeys, masterKey)
+			KeyPairs = append(KeyPairs, keyPair)
 		}
 	}
 
 	var pki []core.Group
-	for i:=0;i<NUMOFMEDIA;i++{
-		pki=append(pki,KeyPairs[i].PK)
+	for i := 0; i < NUMOFMEDIA; i++ {
+		pki = append(pki, KeyPairs[i].PK)
 	}
 
 	start := time.Now()
 	iterations := 0
-	elapsed:=time.Since(start)
+	elapsed := time.Since(start)
 	for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-		sysPk,_ =core.SystemKeygen(pki)
+		sysPk, _ = core.SystemKeygen(pki)
 		iterations++
 		elapsed = time.Since(start)
 	}
@@ -93,18 +94,18 @@ func main() {
 	fmt.Printf(" %8.2f ms per iteration\n", dur)
 
 	var sevs []core.PSIServer
-	clt:=core.NewClientFromInput(sysPk)
-	for i:=0;i<NUMOFMEDIA;i++{
-		sevs=append(sevs,core.NewSeverFromInput(KeyPairs[i].SK))
+	clt := core.NewClientFromInput(sysPk)
+	for i := 0; i < NUMOFMEDIA; i++ {
+		sevs = append(sevs, core.NewSeverFromInput(KeyPairs[i].SK))
 	}
 
 	start = time.Now()
 	iterations = 0
 	elapsed = time.Since(start)
 	for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-		for i:=0;i<NUMOFDID;i++{
-			seed,_:=core.SeedGen()
-			randVal,M,_=clt.Blind(seed,did)
+		for i := 0; i < NUMOFDID; i++ {
+			seed, _ := core.SeedGen()
+			randVal, M, _ = clt.Blind(seed, did)
 		}
 		iterations++
 		elapsed = time.Since(start)
@@ -114,14 +115,14 @@ func main() {
 	fmt.Printf(" %8.2f ms per iteration\n", dur)
 
 	var cipheris []string
-	for i:=0;i<NUMOFMEDIA;i++{
-		if i==0{
+	for i := 0; i < NUMOFMEDIA; i++ {
+		if i == 0 {
 			start = time.Now()
-			iterations=0
-			elapsed=time.Since(start)
+			iterations = 0
+			elapsed = time.Since(start)
 			for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-				for j:=0;j<NUMOFDID;j++{
-					cipheri,_=sevs[i].Enc(M)
+				for j := 0; j < NUMOFDID; j++ {
+					cipheri, _ = sevs[i].Enc(M)
 				}
 				iterations++
 				elapsed = time.Since(start)
@@ -129,10 +130,10 @@ func main() {
 			dur = float64(elapsed/time.Millisecond) / float64(iterations)
 			fmt.Printf("Enc - %8d iterations  ", iterations)
 			fmt.Printf(" %8.2f ms per iteration\n", dur)
-			cipheris=append(cipheris,cipheri)
-		}else{
-			cipher,_:=sevs[i].Enc(M)
-			cipheris=append(cipheris,cipher)
+			cipheris = append(cipheris, cipheri)
+		} else {
+			cipher, _ := sevs[i].Enc(M)
+			cipheris = append(cipheris, cipher)
 		}
 	}
 
@@ -140,8 +141,8 @@ func main() {
 	iterations = 0
 	elapsed = time.Since(start)
 	for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-		for i:=0;i<NUMOFDID;i++{
-			bt,_=clt.Unblind(randVal,cipheris)
+		for i := 0; i < NUMOFDID; i++ {
+			bt, _ = clt.Unblind(randVal, cipheris)
 		}
 		iterations++
 		elapsed = time.Since(start)
@@ -153,17 +154,17 @@ func main() {
 	var cipher []string
 	var dids []string
 	var randVals []string
-	for i:=0;i<NUMOFDID;i++{
-		cipher=append(cipher,bt)
-		dids=append(dids,did)
-		randVals=append(randVals,randVal)
+	for i := 0; i < NUMOFDID; i++ {
+		cipher = append(cipher, bt)
+		dids = append(dids, did)
+		randVals = append(randVals, randVal)
 	}
 
 	start = time.Now()
-	iterations=0
-	elapsed=time.Since(start)
+	iterations = 0
+	elapsed = time.Since(start)
 	for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-		clt.Verify(cipheris,pki,cipher,dids,randVals)
+		clt.Verify(cipheris, pki, cipher, dids, randVals)
 		iterations++
 		elapsed = time.Since(start)
 	}

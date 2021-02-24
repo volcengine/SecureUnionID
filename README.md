@@ -1,25 +1,33 @@
 # SecureUnionID
 
-Secure ECC-based DID intersection in Go.
+Secure ECC-based DID intersection.
 
-**INSTALLION**
+## ABSTRACT
+
+This project is used to protect device ID using Elliptic Curve Cryptography algorithm. The details of this project can be found in [INTRODUCTION](https://github.com/volcengine/SecureUnionID/blob/main/doc/SecureUnionID_Intro.pdf).
+
+## INSTALLION
+
+**For Golang User**
 ```
 go get -u github.com/volcengine/SecureUnionID
 ```
 
-**ABSTRACT**
+**For Java User**
 
-This project is used to protect device ID using Elliptic Curve Cryptography algorithm. The details of this project can be found in [INTRODUCTION](https://github.com/volcengine/SecureUnionID/blob/main/doc/SecureUnionID_Intro.pdf).
+You can just clone this repository and customize your programs by using the interfaces provided in /bindings/java.
 
-**RUN DEMOS**
+## RUN DEMOS
 
-We provide three demos without http communication (/demo/demo.go, /demo/demo1.go, /demo/demo2.go). Run demo with the following command：
+**For Golang User**
+
+We provide three demos without http communication (/bingdings/go/demo/demo.go, /bingdings/go/demo/demo1.go, /bingdings/go/demo/demo2.go). Run demo with the following command：
 ```
 go run demo.go
 go run demo1.go
 go run demo2.go
 ```
-We also provide a demo with http communication (/httpdemo/http_client_demo.go, /httpdemo/http_sever_demo.go). Run this demo with the following command in two terminals:
+We also provide a demo with http communication (/bingdings/go/httpdemo/http_client_demo.go, /bingdings/go/httpdemo/http_sever_demo.go). Run this demo with the following command in two terminals:
 ```
 go run http_client_demo.go
 ```
@@ -27,9 +35,17 @@ go run http_client_demo.go
 go run http_sever_demo.go
 ```
 
-**BENCHMARK**
+**For Java User**
 
-We provide a benchmark file, the path of which is /benchmark/benchmark.go. The performance on a 2.6 GHz core i7, 16G DDR4 mac with 2 medias is as follows: 
+We provide a demo without http communication (/bingdings/java/Demo.java). Run demo with the following command：
+```
+make build
+make run
+```
+
+## BENCHMARK
+
+We provide a benchmark file for Golang user, the path of which is /bindings/go/benchmark/benchmark.go. The performance on a 2.6 GHz core i7, 16G DDR4 mac with 2 media is as follows: 
 ```
 MasterKeyGen -    39076 iterations       0.26 ms per iteration
 KeyGen -    13788 iterations       0.73 ms per iteration
@@ -41,7 +57,7 @@ Verify -     5071 iterations       1.97 ms per iteration
 
 ```
 
-**Doc**
+## Doc
 
 We provide an API document in [API_CN](https://github.com/volcengine/SecureUnionID/blob/main/doc/interface_benchmark_cn.rst) (English version in [API_EN](https://github.com/volcengine/SecureUnionID/blob/main/doc/interface_benchmark_en.rst)). Other contributors can develop interfaces in other languages according to this document.
 

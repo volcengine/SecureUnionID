@@ -22,7 +22,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/volcengine/SecureUnionID/core"
+	"github.com/volcengine/SecureUnionID/bindings/go/core"
 )
 
 var httpClient = &http.Client{Timeout: time.Duration(100 * time.Second)}

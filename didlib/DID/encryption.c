@@ -391,10 +391,10 @@ int verify_individual(char **btistring, char **pkig1string, char **pkig2string, 
         return NULLPOINTER;
     }
 
-    if((bti=(ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofmedia))==NULL){
+    if((bti = (ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofmedia)) == NULL){
         return MALLOCERROR;
     }
-    if((pki=(ECC_PK *)malloc(sizeof(ECC_PK)*numofmedia))==NULL){
+    if((pki = (ECC_PK *)malloc(sizeof(ECC_PK)*numofmedia)) == NULL){
         return MALLOCERROR;
     }
 
@@ -446,10 +446,10 @@ int batch_verify(char **btstring, char **did, char *sysg2string, int numofdid)
         return NULLPOINTER;
     }
 
-    if((hashdid=(ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofdid))==NULL){
+    if((hashdid = (ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofdid)) == NULL){
         return MALLOCERROR;
     }
-    if((bt=(ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofdid))==NULL){
+    if((bt = (ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofdid)) == NULL){
         return MALLOCERROR;
     }
 
@@ -501,7 +501,7 @@ int Unblinding(char **btistring, int numofmedia, char *betastring, char *sysg1st
         return NULLPOINTER;
     }
 
-    if((bti=(ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofmedia))==NULL){
+    if((bti = (ECP_BN254 *)malloc(sizeof(ECP_BN254)*numofmedia)) == NULL){
         return MALLOCERROR;
     }
 

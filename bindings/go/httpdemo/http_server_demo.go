@@ -15,20 +15,24 @@
 package main
 
 import (
-	"github.com/volcengine/SecureUnionID/core"
-	"github.com/volcengine/SecureUnionID/example"
-	"fmt"
+	"github.com/volcengine/SecureUnionID/bindings/go/example"
 )
 
 func main() {
-	dspID := "1234567890"
-	seed, _ := core.SeedGen()
-	masterKeyBT, _ := core.MasterKeyGen(seed)
-	keyPairBT, _ := core.Keygen(masterKeyBT, dspID)
 
-	Sk := example.SkToString(keyPairBT.SK)
+	// 标识媒体的identity
+	serverIdentity := "bytedance"
 
-	fmt.Println("G1: ", keyPairBT.PK.G1)
-	fmt.Println("G2: ", keyPairBT.PK.G2)
-	fmt.Println("Sk: ", Sk, "len: ",len(Sk))
+	// 媒体针对某个固定的dsp所持有的私钥，不公开
+	skStr := "pcl3fdcZy9FxDfBGk64B8fPlDEpIRtiz17ZhkW3Kgug="
+
+	// 媒体针对某个固定的dsp签名使用密钥的版本，需要公开
+	skVersion := "bytedance_v1"
+
+	// server参数初始化
+	example.InitServer(serverIdentity, skStr, skVersion)
+
+	// 启动，监听请求
+	example.StartServer()
+
 }

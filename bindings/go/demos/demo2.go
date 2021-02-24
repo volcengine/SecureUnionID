@@ -25,7 +25,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/volcengine/SecureUnionID/core"
+	"github.com/volcengine/SecureUnionID/bindings/go/core"
 )
 
 func main() {
