@@ -1,0 +1,12 @@
+This is the java bindings (It could run now, but the result is not right yet)
+
+Run the following command:
+
+`make`
+It will use swig to generate the wrap files and then use gcc to compile the libsecureunionid.so
+
+`make build`
+It will use java command to build the java classes
+
+`make run`
+It will run the demoo
