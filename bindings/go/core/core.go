@@ -379,3 +379,13 @@ func NewClientFromInput(sysPk Group) PSIClient {
 func NewSeverFromInput(sk [BIGLENTH]byte) PSIServer {
 	return PSIServer{sk}
 }
+
+func Test(sk [BIGLENTH]byte, pk Group) int {
+	g1char := C.CString(pk.G1)
+	defer C.free(unsafe.Pointer(g1char))
+	g2char := C.CString(pk.G2)
+	defer C.free(unsafe.Pointer(g2char))
+	result := C.test((*C.char)(unsafe.Pointer(&sk[0])), g1char, g2char)
+
+	return (int)(result)
+}

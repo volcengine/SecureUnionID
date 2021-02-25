@@ -32,4 +32,5 @@ func main() {
 	fmt.Println("G1: ", keyPairBT.PK.G1)
 	fmt.Println("G2: ", keyPairBT.PK.G2)
 	fmt.Println("Sk: ", Sk, "len: ", len(Sk))
+
 }

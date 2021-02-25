@@ -75,4 +75,6 @@ int verify_individual(char **btistring, char **pkig1string, char **pkig2string, 
 //btstring represents the string which is composed of several results of different dids
 int batch_verify(char **btstring, char **did, char *sysg2string, int numofdid);
 
+int test(char *skstring, char *pkg1, char *pkg2);
+
 #endif
