@@ -1,5 +1,8 @@
 This is the java bindings for Secure ECC-based DID intersection.
 
+You should install java SDK first.
+and change `JAVA_HOME` of the Makefile to be your own JAVA SDK path.
+
 Run the following command:
 ```
 make

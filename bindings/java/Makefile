@@ -13,12 +13,12 @@ ifeq ($(UNAME_S),Linux)
 # jni.h path
 JAVA_HOME = /usr/lib/jvm/java-8-openjdk-amd64
 # jni_md.h
-JNI_CFLAG = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+JNI_CFLAG = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux"
 endif
 
 ifeq ($(UNAME_S),Darwin)
 JAVA_HOME:=`/usr/libexec/java_home`
-JNI_CFLAG = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin
+JNI_CFLAG = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
 endif
 
 

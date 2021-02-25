@@ -14,7 +14,11 @@ go get -u github.com/volcengine/SecureUnionID
 ```
 
 **For Java User**
-The Java source code is under the bindings/java directory. Run the following command:
+The Java source code is under the bindings/java directory.
+
+Please make sure java SDK is installed. Please change the `JAVA_HOME` of the
+`Makefile` in bindings/java to be your own JAVA SDK path. Then run the
+following command:
 ```
 cd bindings/java && make
 ```
