@@ -535,3 +535,32 @@ int Unblinding(char **btistring, int numofmedia, char *betastring, char *sysg1st
     return SUCCESS;
 }
 
+int test(char *skstring, char *pkg1, char *pkg2){
+    char pkg1string[2*G1LENTH+1];
+    char pkg2string[2*G2LENTH+1];
+    ECC_PK pk;
+    ECC_para para;
+    BIG_256_56 alpha;
+    BIG_256_56 q;
+
+    BIG_256_56_fromBytes(alpha, skstring);
+    BIG_256_56_rcopy(q, CURVE_Order_BN254);
+    BIG_256_56_mod(alpha,q);
+
+    // PK1=g1^alpha
+    g1_deserialize(&(para.g1),parag1string);
+    ECP_BN254_copy(&pk.PK1, &(para.g1));
+    ECP_BN254_mul(&pk.PK1, alpha);
+
+    // PK2=g2^alpha
+    g2_deserialize(&(para.g2),parag2string);
+    ECP2_BN254_copy(&pk.PK2, &(para.g2));
+    ECP2_BN254_mul(&pk.PK2, alpha);
+
+    // serialize the public key and store it into pkstring */
+    g1_serialize(pk.PK1, pkg1string);
+    g2_serialize(pk.PK2, pkg2string);
+
+    return !strcmp(pkg1string,pkg1)&&!strcmp(pkg2string,pkg2);
+}
+
