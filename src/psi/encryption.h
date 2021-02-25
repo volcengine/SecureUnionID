@@ -14,11 +14,11 @@
 
 #ifndef DID_ENCRYPTION_H
 #define DID_ENCRYPTION_H
-#include "../BN254/ecp_BN254.h"
-#include "../BN254/ecp2_BN254.h"
-#include "../BN254/fn_BN254.h"
-#include "../BN254/pair_BN254.h"
-#include "../BN254/hkdf.h"
+#include "../crypto/ecp_BN254.h"
+#include "../crypto/ecp2_BN254.h"
+#include "../crypto/fn_BN254.h"
+#include "../crypto/pair_BN254.h"
+#include "../crypto/hkdf.h"
 #include "fcntl.h"
 #include "string.h"
 #include "time.h"

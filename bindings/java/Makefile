@@ -22,8 +22,8 @@ JNI_CFLAG = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin
 endif
 
 
-ECC_DIR = ../../didlib/BN254
-CORE_DIR = ../../didlib/DID
+ECC_DIR = ../../src/crypto
+CORE_DIR = ../../src/psi
 OBJ_DIR = objs
 
 ECC_SRCS := $(wildcard $(ECC_DIR)/*.c)

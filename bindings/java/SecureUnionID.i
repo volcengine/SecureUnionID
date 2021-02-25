@@ -14,7 +14,7 @@
 
 %module SecureUnionID
 %{
-#include "../../didlib/DID/encryption.h"
+#include "../../src/psi/encryption.h"
 %}
 
 %include various.i
