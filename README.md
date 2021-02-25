@@ -14,9 +14,12 @@ go get -u github.com/volcengine/SecureUnionID
 ```
 
 **For Java User**
-
-You can just clone this repository and customize your programs by using the interfaces provided in /bindings/java.
-
+The Java source code is under the bindings/java directory. Run the following command:
+```
+cd bindings/java && make
+```
+It will generate libSecureUnionID.so on Linux or libSecureUnionID.dylib on Mac OS. You should put the library into java
+library path when using it.
 ## RUN DEMOS
 
 **For Golang User**
@@ -39,8 +42,7 @@ go run http_sever_demo.go
 
 We provide a demo without http communication (/bingdings/java/Demo.java). Run demo with the following command：
 ```
-make build
-make run
+cd bindings/java && make && make build && make run
 ```
 
 ## BENCHMARK

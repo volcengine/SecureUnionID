@@ -34,6 +34,7 @@ OBJS := $(ECC_SRCS:$(ECC_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS += $(CORE_SRCS:$(CORE_DIR)/%.c=$(OBJ_DIR)/%.o)
 OBJS += $(OBJ_DIR)/$(SWIG_WRAP_NAME).o
 
+# build all share library
 all: $(OBJS)
 ifeq ($(UNAME_S),Linux)
 	$(CC) -shared -o lib$(SWIG_INTERFACE_NAME).so $^ $(CFLAGS)
@@ -53,8 +54,9 @@ $(OBJ_DIR)/%.o: $(CORE_DIR)/%.c $(OBJ_DIR)
 $(OBJ_DIR):
 	mkdir objs
 
+# clean the library files
 clean:
-	rm -f $(SWIG_INTERFACE_NAME)*.java *.c *.so *.class *.dylib
+	rm -f *.so *.class *.dylib
 	rm -rf $(OBJ_DIR)
 
 $(SWIG_WRAP_NAME).c: $(SWIG_FILE)
@@ -64,8 +66,20 @@ $(SWIG_WRAP_NAME).c: $(SWIG_FILE)
 $(OBJ_DIR)/$(SWIG_WRAP_NAME).o: $(SWIG_WRAP_NAME).c
 	gcc -c $(SWIG_WRAP_NAME).c -fPIC $(JNI_CFLAG) -o $(OBJ_DIR)/$(SWIG_WRAP_NAME).o
 
+# compile java source code into classes
 build:
 	javac *.java
 
+# run the java demo
 run:
 	java -Djava.library.path=. Demo
+
+# re-genereate the swig wrapper files. This is only used by the developers.
+gen:
+	rm -f SecureUnionID*.java *.c
+	$(SWIG) $(SWIG_FLAGS) $(SWIG_FILE)
+
+# clean all the files. This is only used by the developers.
+distclean:
+	rm -f *.so *.class *.dylib SecureUnionID*.java *.c
+	rm -rf $(OBJ_DIR)
