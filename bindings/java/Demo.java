@@ -22,9 +22,9 @@ class Demo {
     public static final int G1_LEN = 33;
     public static final int G2_LEN = 128;
 
-    // the lenght of public key on G1 group
+    // the length of public key on G1 group
     public static final int PUBKEY_G1_LEN = G1_LEN * 2 + 1;
-    // the lenght of public key on G2 group
+    // the length of public key on G2 group
     public static final int PUBKEY_G2_LEN = G2_LEN * 2 + 1;
 
     public static final int SUCCESS = 2;
@@ -42,9 +42,9 @@ class Demo {
         return new String(hexChars);
     }
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         // load the library libsecureunionid.so. It should be in the java library path
-		System.loadLibrary("SecureUnionID");
+        System.loadLibrary("SecureUnionID");
 
         SecureUnionID secureUnionID = new SecureUnionID();
 
@@ -154,5 +154,5 @@ class Demo {
         else {
             System.out.println("Success!\n");
         }
-	}
+    }
 }
