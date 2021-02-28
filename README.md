@@ -65,6 +65,6 @@ Verify -     5071 iterations       1.97 ms per iteration
 
 ## Doc
 
-We provide an API document in [API_CN](https://github.com/volcengine/SecureUnionID/blob/main/doc/interface_benchmark_cn.rst) (English version in [API_EN](https://github.com/volcengine/SecureUnionID/blob/main/doc/interface_benchmark_en.rst)). Other contributors can develop interfaces in other languages according to this document.
+We provide API documents of [C](https://github.com/volcengine/SecureUnionID/blob/main/doc/c_doc_cn.rst), [Go](https://github.com/volcengine/SecureUnionID/blob/main/doc/go_doc_cn.rst), [Java](https://github.com/volcengine/SecureUnionID/blob/main/doc/java_doc_cn.rst) (English version in [C_EN](https://github.com/volcengine/SecureUnionID/blob/main/doc/c_doc_en.rst), [Go_EN](https://github.com/volcengine/SecureUnionID/blob/main/doc/go_doc_en.rst), [Java_EN](https://github.com/volcengine/SecureUnionID/blob/main/doc/java_doc_en.rst)). Other contributors can develop interfaces in other languages according to this document.
 
 Released under the [Apache](https://github.com/volcengine/SecureUnionID/blob/main/LICENSE) License.
