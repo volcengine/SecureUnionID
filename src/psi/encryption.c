@@ -174,6 +174,19 @@ void HASHIT(char *hashstring, char *m)
 
 /**---------------------------dividing line-----------------------------**/
 
+// generate random seed
+unsigned long randomSeed() {
+    unsigned long seed = 0;
+    int fd = open("/dev/urandom", O_RDONLY);
+    if (fd < 0) {
+        return 0;
+    }
+    while(seed == 0) {
+        read(fd, &seed, sizeof(seed));
+    }
+    return seed;
+}
+
 /*int Genpara(char *parag1string, char *parag2string)
 {
     if(!parag1string || !parag2string){

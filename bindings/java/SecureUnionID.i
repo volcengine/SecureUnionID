@@ -21,6 +21,9 @@
 
 // Hash func: {0,1}->G1
 void HASHIT(char *hashstring, char *m);
+
+// generate random seed
+unsigned long randomSeed();
     
 // generate master key
 int MasterKeygen(unsigned long ran, char *BYTE);

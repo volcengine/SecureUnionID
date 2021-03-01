@@ -9,6 +9,7 @@
 
 public class SecureUnionIDJNI {
   public final static native void HASHIT(String jarg1, String jarg2);
+  public final static native long randomSeed();
   public final static native int MasterKeygen(long jarg1, byte[] jarg2);
   public final static native int Keygen(byte[] jarg1, String jarg2, byte[] jarg3, byte[] jarg4, byte[] jarg5);
   public final static native int System_Keygen(String[] jarg1, String[] jarg2, int jarg3, byte[] jarg4, byte[] jarg5);

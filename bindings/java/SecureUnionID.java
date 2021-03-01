@@ -12,6 +12,10 @@ public class SecureUnionID {
     SecureUnionIDJNI.HASHIT(hashstring, m);
   }
 
+  public static long randomSeed() {
+    return SecureUnionIDJNI.randomSeed();
+  }
+
   public static int MasterKeygen(long ran, byte[] BYTE) {
     return SecureUnionIDJNI.MasterKeygen(ran, BYTE);
   }
