@@ -22,6 +22,7 @@
 #include "fcntl.h"
 #include "string.h"
 #include "time.h"
+#include <unistd.h>
 #define G1LENTH (MODBYTES_256_56+1)
 #define G2LENTH 4*MODBYTES_256_56
 
@@ -48,7 +49,7 @@ void HASHIT(char *hashstring, char *m);
 
 //set system para
 /*void Setpara();*/
-
+unsigned long randomSeed();
 //generate master key
 int MasterKeygen(unsigned long ran, char *masterkey );
 

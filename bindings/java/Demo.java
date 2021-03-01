@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import java.util.Random;
 class Demo {
     // master key length.
     public static final int MASTER_KEY_LEN = 64;
@@ -54,8 +53,8 @@ class Demo {
 
         System.out.println("--------------------------------------------------");
         System.out.println("Step 0: generate master key.");
-        Random rand = new Random();
-        int randSeed = rand.nextInt();
+
+        long randSeed = secureUnionID.randomSeed();
         //System.out.printf("random seed is %d\n", randSeed);
         secureUnionID.MasterKeygen(randSeed, masterKey);
         System.out.printf("masterKey is: %s\n", bytesToHex(masterKey));
@@ -93,13 +92,13 @@ class Demo {
         System.out.println("Step 3: blind");
         byte betaValue0[] = new byte[2 * PRIVATE_KEY_LEN + 1];
         byte blindResult0[] = new byte[PUBKEY_G1_LEN];
-        randSeed = rand.nextInt();
+        randSeed = secureUnionID.randomSeed();
         secureUnionID.Blinding(deviceId0, randSeed, betaValue0, blindResult0);
         System.out.printf("blind result for device id 0: %s\n", bytesToHex(blindResult0));
 
         byte betaValue1[] = new byte[2 * PRIVATE_KEY_LEN + 1];
         byte blindResult1[] = new byte[PUBKEY_G1_LEN];
-        randSeed = rand.nextInt();
+        randSeed = secureUnionID.randomSeed();
         secureUnionID.Blinding(deviceId1, randSeed, betaValue1, blindResult1);
         System.out.printf("blind result for device id 1: %s\n", bytesToHex(blindResult1));
 

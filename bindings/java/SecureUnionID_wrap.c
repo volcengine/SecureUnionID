@@ -237,6 +237,18 @@ SWIGEXPORT void JNICALL Java_SecureUnionIDJNI_HASHIT(JNIEnv *jenv, jclass jcls, 
 }
 
 
+SWIGEXPORT jlong JNICALL Java_SecureUnionIDJNI_randomSeed(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  unsigned long result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (unsigned long)randomSeed();
+  jresult = (jlong)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_SecureUnionIDJNI_MasterKeygen(JNIEnv *jenv, jclass jcls, jlong jarg1, jbyteArray jarg2) {
   jint jresult = 0 ;
   unsigned long arg1 ;
