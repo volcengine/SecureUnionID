@@ -16,7 +16,7 @@ System.loadLibrary("SecureUnionID");
               seed        随机数种子
               masterKey   生成的主密钥, 长度为64
 
-      错误返回：成功 或 “masterKey空指针”错误
+      错误返回：0代表成功; 小于0代表失败
 
 - **密钥生成**
      **int Keygen(byte[] masterKey, String dspId, byte[] publicKeyOfG1, byte[] publicKeyOfG2, byte[] privateKey);**
@@ -32,7 +32,7 @@ System.loadLibrary("SecureUnionID");
               publicKeyOfG2          生成的在群G2的公钥, 长度为257
               privateKey             生成的私钥, 长度为32
 
-     错误返回：成功 或 “参数空指针”错误
+     错误返回：0代表成功; 小于0代表失败
 
 - **系统公钥生成**
      **int System_Keygen(String[] publicKeyOfG1Array, String[] publicKeyOfG2Array, int numofMedia, byte[] systemKeyOfG1, byte[] systemKeyOfG2)**
@@ -48,7 +48,7 @@ System.loadLibrary("SecureUnionID");
               systemKeyOfG1          对应DSP的在群G1上的系统公钥, 长度为67
               systemKeyOfG2          对应DSP的在群G2上的系统公钥, 长度为257
 
-     错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误
+     错误返回：0代表成功; 小于0代表失败
 
 - **盲化**
      **int Blinding(String deviceId, long seed, byte[] betaValue, byte[] blindResult)**
@@ -63,7 +63,7 @@ System.loadLibrary("SecureUnionID");
               betaValue     盲化随机数对应的序列化字符串, 长度为65
               blindResult   盲化后的结果, 长度为67
 
-     错误返回：成功 或 “参数空指针”错误
+     错误返回：0代表成功; 小于0代表失败
 
 - **加密**
      **int Enc(byte[] privateKey, byte[] plainText, byte[] cipherText)**
@@ -77,7 +77,7 @@ System.loadLibrary("SecureUnionID");
               plainText     要加密的字符串, 一般为哈希后的设备ID或盲化后的设备ID, 长度为67
               cipherText    加密后的密文, 长度为67
 
-     错误返回：成功 或 “参数空指针”错误
+     错误返回：0代表成功; 小于0代表失败
 
 - **去盲化**
      **int Unblinding(String[] cipherTextArray, int numofMedia, byte[]  betaValue, byte[] systemKeyOfG1, byte[] unblindCipherText)**
@@ -93,7 +93,7 @@ System.loadLibrary("SecureUnionID");
                   systemKeyOfG1      在G1上的系统公钥, 长度为67
                   unblindCipherText  最终的的加密的字符串, 长度为67
 
-     错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误
+     错误返回：0代表成功; 小于0代表失败
 
 - **单独验证**
      **int verify_individual(String[] cipherTextArray, String[] publicKeyOfG1Array, String[] publicKeyOfG2Array, String deviceId, int numofMedia, byte[] betaValue)**
@@ -110,7 +110,7 @@ System.loadLibrary("SecureUnionID");
               numofMedia                参与的媒体个数
               betaValue                 当时盲化所用的随机数对应的序列化字符串, 长度为67
 
-     错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误 或 作弊媒体编号的相反数
+     错误返回：0代表验证成功; 其他数值代表校验失败，其中小于0代表内部错误, 大于0代表作弊媒体编号
 
 - **批量验证**
      **int batch_verify(String[] unblindCipherArray, String[] allDeviceIds, byte[] systemKeyOfG2, int numofDeviceIds)**
@@ -125,7 +125,7 @@ System.loadLibrary("SecureUnionID");
               systemKeyOfG2        对应DSP的在群G2上的系统公钥, 长度为257
               numofDeviceIds       设备ID的个数
 
-     错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误
+     错误返回：0代表成功; 小于0代表失败
 
 **示例**
 ^^^^^^^^^^
