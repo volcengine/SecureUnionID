@@ -59,8 +59,8 @@ clean:
 	rm -f *.so *.class *.dylib
 	rm -rf $(OBJ_DIR)
 
-$(SWIG_WRAP_NAME).c: $(SWIG_FILE)
-	$(SWIG) $(SWIG_FLAGS) $(SWIG_FILE)
+#$(SWIG_WRAP_NAME).c: $(SWIG_FILE)
+	#$(SWIG) $(SWIG_FLAGS) $(SWIG_FILE)
 
 
 $(OBJ_DIR)/$(SWIG_WRAP_NAME).o: $(SWIG_WRAP_NAME).c

@@ -26,8 +26,6 @@ class Demo {
     // the length of public key on G2 group
     public static final int PUBKEY_G2_LEN = G2_LEN * 2 + 1;
 
-    public static final int SUCCESS = 2;
-
     // borrowed from
     // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
@@ -56,7 +54,11 @@ class Demo {
 
         long randSeed = secureUnionID.randomSeed();
         //System.out.printf("random seed is %d\n", randSeed);
-        secureUnionID.MasterKeygen(randSeed, masterKey);
+        int r = secureUnionID.MasterKeygen(randSeed, masterKey);
+        if (r != 0) {
+            System.out.printf("generate master key error %d\n", r);
+            return;
+        }
         System.out.printf("masterKey is: %s\n", bytesToHex(masterKey));
 
         String dspID = "1234567890";
@@ -67,7 +69,11 @@ class Demo {
         byte publicKeyOfG1[] = new byte[PUBKEY_G1_LEN];
         byte publicKeyOfG2[] = new byte[PUBKEY_G2_LEN];
         byte privateKey[] = new byte[PRIVATE_KEY_LEN];
-        secureUnionID.Keygen(masterKey, dspID, publicKeyOfG1, publicKeyOfG2, privateKey);
+        r = secureUnionID.Keygen(masterKey, dspID, publicKeyOfG1, publicKeyOfG2, privateKey);
+        if (r != 0) {
+            System.out.printf("generate key error %d\n", r);
+            return;
+        }
 
         System.out.printf("publicKey of G1: is %s\n", bytesToHex(publicKeyOfG1));
         System.out.printf("publicKey of G2: is %s\n", bytesToHex(publicKeyOfG2));
@@ -81,7 +87,11 @@ class Demo {
         publicKeyOfG2Array[0] = new String(publicKeyOfG2);
         byte systemKeyOfG1[] = new byte[PUBKEY_G1_LEN];
         byte systemKeyOfG2[] = new byte[PUBKEY_G2_LEN];
-        secureUnionID.System_Keygen(publicKeyOfG1Array, publicKeyOfG2Array, 1, systemKeyOfG1, systemKeyOfG2);
+        r = secureUnionID.System_Keygen(publicKeyOfG1Array, publicKeyOfG2Array, 1, systemKeyOfG1, systemKeyOfG2);
+        if (r != 0) {
+            System.out.printf("generate system key error %d\n", r);
+            return;
+        }
 
         // the device id number to protect.
         String deviceId0 = "123456789012345";
@@ -93,24 +103,40 @@ class Demo {
         byte betaValue0[] = new byte[2 * PRIVATE_KEY_LEN + 1];
         byte blindResult0[] = new byte[PUBKEY_G1_LEN];
         randSeed = secureUnionID.randomSeed();
-        secureUnionID.Blinding(deviceId0, randSeed, betaValue0, blindResult0);
+        r = secureUnionID.Blinding(deviceId0, randSeed, betaValue0, blindResult0);
+        if (r != 0) {
+            System.out.printf("blinding error %d\n", r);
+            return;
+        }
         System.out.printf("blind result for device id 0: %s\n", bytesToHex(blindResult0));
 
         byte betaValue1[] = new byte[2 * PRIVATE_KEY_LEN + 1];
         byte blindResult1[] = new byte[PUBKEY_G1_LEN];
         randSeed = secureUnionID.randomSeed();
-        secureUnionID.Blinding(deviceId1, randSeed, betaValue1, blindResult1);
+        r = secureUnionID.Blinding(deviceId1, randSeed, betaValue1, blindResult1);
+        if (r != 0) {
+            System.out.printf("blinding error %d\n", r);
+            return;
+        }
         System.out.printf("blind result for device id 1: %s\n", bytesToHex(blindResult1));
 
         // encryption
         System.out.println("--------------------------------------------------");
         System.out.println("Step 4: encrypt");
         byte cipherText0[] = new byte[PUBKEY_G1_LEN];
-        secureUnionID.Enc(privateKey, blindResult0, cipherText0);
+        r = secureUnionID.Enc(privateKey, blindResult0, cipherText0);
+        if (r != 0) {
+            System.out.printf("encrypt error %d\n", r);
+            return;
+        }
         System.out.printf("encrypt result for device id 0: %s\n", bytesToHex(blindResult0));
 
         byte cipherText1[] = new byte[PUBKEY_G1_LEN];
-        secureUnionID.Enc(privateKey, blindResult1, cipherText1);
+        r = secureUnionID.Enc(privateKey, blindResult1, cipherText1);
+        if (r != 0) {
+            System.out.printf("encrypt error %d\n", r);
+            return;
+        }
         System.out.printf("encrypt result for device id 1: %s\n", bytesToHex(blindResult1));
 
         // unblinding
@@ -119,13 +145,21 @@ class Demo {
         byte unblindCipherText0[] = new byte[PUBKEY_G1_LEN];
         String[] cipherTextArray = new String[1];
         cipherTextArray[0] = new String(cipherText0);
-        secureUnionID.Unblinding(cipherTextArray, 1, betaValue0, systemKeyOfG1, unblindCipherText0);
+        r = secureUnionID.Unblinding(cipherTextArray, 1, betaValue0, systemKeyOfG1, unblindCipherText0);
+        if (r != 0) {
+            System.out.printf("unblinding error %d\n", r);
+            return;
+        }
         System.out.printf("unblind result for device id 0: %s\n", bytesToHex(unblindCipherText0));
 
 
         byte unblindCipherText1[] = new byte[PUBKEY_G1_LEN];
         cipherTextArray[0] = new String(cipherText1);
-        secureUnionID.Unblinding(cipherTextArray, 1, betaValue1, systemKeyOfG1, unblindCipherText1);
+        r = secureUnionID.Unblinding(cipherTextArray, 1, betaValue1, systemKeyOfG1, unblindCipherText1);
+        if (r != 0) {
+            System.out.printf("unblinding error %d\n", r);
+            return;
+        }
         System.out.printf("unblind result for device id 1: %s\n", bytesToHex(unblindCipherText1));
 
         System.out.println("--------------------------------------------------");
@@ -138,12 +172,12 @@ class Demo {
         allDeviceIds[0] = deviceId0;
         allDeviceIds[1] = deviceId1;
         // verify
-        int r = secureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, 2);
+        r = secureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, 2);
 
-        if (r != SUCCESS) {
+        if (r != 0) {
             cipherTextArray[0] = new String(cipherText0);
             int result = secureUnionID.verify_individual(cipherTextArray, publicKeyOfG1Array, publicKeyOfG2Array, deviceId0, 1, betaValue0);
-            if (result < 0) {
+            if (result != 0) {
                 System.out.println("Cheat on the first device id!\n");
             }
             else {

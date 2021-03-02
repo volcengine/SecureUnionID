@@ -18,7 +18,7 @@ System.loadLibrary("SecureUnionID");
               seed:        random number seed
               masterKey:   generated master key
 
-     Error Return: success or "masterkey null pointer" error
+     Error Return: 0 means success; less than 0 means failure
 
 - **Key Generation**
      **int Keygen(byte[] masterKey, String dspId, byte[] publicKeyOfG1, byte[] publicKeyOfG2, byte[] privateKey)**
@@ -34,7 +34,7 @@ System.loadLibrary("SecureUnionID");
               publicKeyOfG2           the generated public key on group G2
               privateKey:             the generated private key
 
-     Error Return: success or "parameter null pointer" error
+     Error Return: 0 means success; less than 0 means failure
 
 - **System Public Key Generation**
      **int System_Keygen(String[] publicKeyOfG1Array, String[] publicKeyOfG2Array, int numofMedia, byte[] systemKeyOfG1, byte[] systemKeyOfG2)**
@@ -48,7 +48,7 @@ System.loadLibrary("SecureUnionID");
               systemKeyOfG1:        the system public key of the DSP on group G1
               systemKeyOfG2:        the system public key of the DSP on group G2
 
-     Error return: success or "parameter null pointer" error or "allocation space" error
+     Error return: 0 means success; less than 0 means failure
      
 - **Blinding**
      **int Blinding(String deviceId, long seed, byte[] betaValue, byte[] blindResult)**
@@ -63,7 +63,7 @@ System.loadLibrary("SecureUnionID");
               betaValue:          the serialized string corresponding to the random number used for blinding
               blindResult:        the serialized string corresponding to the blinded result
 
-     Error Return: success or "parameter null pointer" error
+     Error Return: 0 means success; less than 0 means failure
 
 - **Encryption**
      **int Enc(byte[] privateKey, byte[] plainText, byte[] cipherText)**
@@ -77,7 +77,7 @@ System.loadLibrary("SecureUnionID");
               plainText:     the string to be encrypted
               cipherText:    the encrypted string
 
-     Error Return: success or "parameter null pointer" error
+     Error Return: 0 means success; less than 0 means failure
 
 - **Unblinding**
      **int Unblinding(String[] cipherTextArray, int numofMedia, byte[]  betaValue, byte[] systemKeyOfG1, byte[] unblindCipherText)**
@@ -93,7 +93,7 @@ System.loadLibrary("SecureUnionID");
               systemKeyOfG1:      the serialized string corresponding to the public key on group G1
               unblindCipherText:  the final encrypted string
 
-     Error Return: nil or "parameter null pointer" error or "allocation space" error
+     Error Return: 0 means success; less than 0 means failure
 
 - **Individual Verification**
      **int verify_individual(String[] cipherTextArray, String[] publicKeyOfG1Array, String[] publicKeyOfG2Array, String deviceId, int numofMedia, byte[] betaValue)**
@@ -110,7 +110,7 @@ System.loadLibrary("SecureUnionID");
               numofMedia:                 the number of participating media
               betaValue:                  the serialized string corresponding to the random number used for blinding
 
-     Error Return: success or "parameter null pointer" error or "allocation space" error or the opposite of the cheating media number
+     Error Return: 0 means success; less than 0 means failure; greater than 0 means the cheating media number
 
 - **Batch Verification**
      **int batch_verify(String[] unblindCipherArray, String[] allDeviceIds, byte[] systemKeyOfG2, int numofDeviceIds)****
@@ -125,7 +125,7 @@ System.loadLibrary("SecureUnionID");
               systemKeyOfG2:            the system public key on group G2
               numofDeviceIds:           the number of device identifiers
 
-     Error Return: success or "parameter null pointer" error or "allocation space" error
+     Error Return: 0 means success; less than 0 means failure
 
 
 **example**
