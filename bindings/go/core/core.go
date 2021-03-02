@@ -206,6 +206,7 @@ func SystemKeygen(pki []Group) (Group, error) {
 func HashToG1(did string) string {
 	var didHash string
 	didChar := C.CString(did)
+	defer C.free(unsafe.Pointer(didChar))
 
 	hashBuffer := make([]byte, 2*G1LENTH+1)
 	hashPtr := (*C.char)(unsafe.Pointer(&hashBuffer[0]))
