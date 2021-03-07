@@ -109,7 +109,7 @@ class Demo {
         }
         System.out.printf("blind result for device id 0: %s\n", bytesToHex(blindResult0));
         System.out.println( new String( blindResult0 ) );
-        System.out.println( "---------------------===============");
+        System.out.println( "-------------------------------------------------");
 
         byte betaValue1[] = new byte[2 * PRIVATE_KEY_LEN + 1];
         byte blindResult1[] = new byte[PUBKEY_G1_LEN];

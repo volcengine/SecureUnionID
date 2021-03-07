@@ -1,4 +1,4 @@
-# How to Build secureunionid.jar
+# How to build secureunionid.jar
 
 After compiling the secureunionidjni library, compile the jar file
 
@@ -13,5 +13,10 @@ The build requires the following components:
 $ mvn clean package
 ```
 
+### Run the demo
+
+``` bash
+$ java -jar target/secureunionid-0.1.jar
+```
 
 

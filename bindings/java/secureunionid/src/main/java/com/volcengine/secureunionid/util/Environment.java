@@ -127,7 +127,7 @@ public class Environment {
   }
 
   public static String getJniLibraryFileName(final String name) {
-    return appendLibOsSuffix("lib" + getJniLibraryName(name), false);
+    return appendLibOsSuffix("lib" + getJniLibraryName(name), true);
   }
 
   private static String appendLibOsSuffix(final String libraryFileName, final boolean shared) {
@@ -145,6 +145,6 @@ public class Environment {
     if (isWindows()) {
       return ".dll";
     }
-    return (isMac()) ? ".jnilib" : ".so";
+    return (isMac()) ? ".dylib" : ".so";
   }
 }
