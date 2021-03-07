@@ -10,14 +10,14 @@ The build requires the following components:
 -   Make
 -   C++ compiler: gcc 9 or newer
 -   Linker: lld or gold (the classic GNU ld won’t work)
--   JDK 1.8 or newer (JAVA_HOME should be set)
+-   JDK 1.8 or newer (JAVA_HOME should be set. For instance, export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64")
 
 ### Build secureunionidjni
 
 ``` bash
 $ mkdir build
 $ cd build
-$ cmake ..
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
 $ make
 ```
 
@@ -41,14 +41,14 @@ The build requires the following components:
 -   CMake 3.10 or newer
 -   Make
 -   Apple clang
--   JDK 1.8 or newer  (JAVA_HOME should be set)
+-   JDK 1.8 or newer  (JAVA_HOME should be set. For instance, export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home")
 
 ### Build secureunionidjni
 
 ``` bash
 $ mkdir build
 $ cd build
-$ cmake ..
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
 $ make
 ```
 
@@ -71,18 +71,21 @@ The build requires the following components:
 
 -   mingw-w64 x86_64-8.1.0-posix-seh-rt_v6-rev0 or newer
 -   CLion 2018.1 or newer
--   JDK 1.8 or newer  (JAVA_HOME should be set)
+-   JDK 1.8 or newer  (JAVA_HOME should be set. For instance, JAVA_HOME="C:\Program Files\Unity\Hub\Editor\2019.3.0a3\Editor\Data\PlaybackEngines\AndroidPlayer\Tools\OpenJDK\Windows")
 
 ### Build secureunionidjni
 
-**1.** Set the compiler of the CLion to MinGW
-File -> Settings -> Build,Execution,Deployment -> Toolchains
+**1.** Open this directory on the CLion
 
-**2.** Open this directory on the CLion
 File -> Open
 
-**3.** Build dll
-Run -> Build
+**1.** Set the compiler of the CLion to MinGW
+
+File -> Settings -> Build,Execution,Deployment -> Toolchains
+
+**3.** Build the library
+
+Set CMake setting to be `Release` and click the `Reload CMake Project` button, which generates the Make files. And then Run -> Build.
 
 Output the following info:
 ```
