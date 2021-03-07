@@ -1,19 +1,11 @@
 This is the java bindings for Secure ECC-based DID intersection.
 
-You should install java SDK first.
-and change `JAVA_HOME` of the Makefile to be your own JAVA SDK path.
+The secureunionidjni directory is used for building the native share library.
+The secureunionid directory is used for building the jar package.
 
-Run the following command:
-```
-make
-```
-It uses gcc to compile the source code and generates the libSecureUnionID.so on Linux
-or libSecureUnionID.dylib on Mac.
-```
-make build
-```
-It uses java command to compile the java source code into java classes.
-```
-make run
-```
-It runs the demo.
+First, you need go to the secureunionidjni and build the library following its
+READEME.md file. It generates the libsecureunionidjni-linux64.so on Linux,
+libsecureunionidjni-osx.dylib on Mac or libsecureunionidjni-win64.dll on Windows.
+
+Then you need go to the secureunionid directory to build the jar package following
+its README.md file.
