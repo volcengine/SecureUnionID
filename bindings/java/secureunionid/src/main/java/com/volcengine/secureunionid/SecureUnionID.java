@@ -25,6 +25,8 @@ public class SecureUnionID {
 
   // the length of public key on G1 group
   public static final int PUBKEY_G1_LEN = G1_LEN * 2 + 1;
+  // the length of blind result
+  public static final int BLIND_RESULT_LEN_STRIM = PUBKEY_G1_LEN - 1;
   // the length of public key on G2 group
   public static final int PUBKEY_G2_LEN = G2_LEN * 2 + 1;
 
@@ -186,7 +188,7 @@ public class SecureUnionID {
 
   public static int Enc(byte[] arg0, byte[] arg1, byte[] arg2) {
     if (arg0 == null || arg0.length < PRIVATE_KEY_LEN ||
-        arg1 == null || arg1.length < PUBKEY_G1_LEN ||
+        arg1 == null || arg1.length < BLIND_RESULT_LEN_STRIM ||
         arg2 == null || arg2.length < PUBKEY_G1_LEN)
         return JAVA_NULL_OR_LENGTH_ERROR;
     int r = SecureUnionIDJNI.Enc(arg0, arg1, arg2);
