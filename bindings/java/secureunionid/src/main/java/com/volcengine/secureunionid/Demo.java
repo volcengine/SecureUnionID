@@ -125,7 +125,12 @@ class Demo {
         System.out.println("--------------------------------------------------");
         System.out.println("Step 4: encrypt");
         byte cipherText0[] = new byte[PUBKEY_G1_LEN];
-        r = secureUnionID.Enc(privateKey, blindResult0, cipherText0);
+
+        System.out.printf("blind result length is %d\n", blindResult0.length);
+        // for the go server, the blind result size is 66 instead of 67.
+        String blindResultStr0 = new String(blindResult0).trim();
+        System.out.printf("After strim blind result length is %d\n", blindResultStr0.length());
+        r = secureUnionID.Enc(privateKey, blindResultStr0.getBytes(), cipherText0);
         if (r != 0) {
             System.out.printf("encrypt error %d\n", r);
             return;
@@ -133,7 +138,13 @@ class Demo {
         System.out.printf("encrypt result for device id 0: %s\n", bytesToHex(blindResult0));
 
         byte cipherText1[] = new byte[PUBKEY_G1_LEN];
-        r = secureUnionID.Enc(privateKey, blindResult1, cipherText1);
+        System.out.printf("blind result length is %d\n", blindResult1.length);
+        // for the go server, the blind result size is 66 instead of 67.
+        String blindResultStr1 = new String(blindResult1).trim();
+        System.out.printf("After strim blind result length is %d\n", blindResultStr1.length());
+
+
+        r = secureUnionID.Enc(privateKey, blindResultStr1.getBytes(), cipherText1);
         if (r != 0) {
             System.out.printf("encrypt error %d\n", r);
             return;
