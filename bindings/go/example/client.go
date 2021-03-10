@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -75,25 +76,44 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	// seed
 	seed, _ := core.SeedGen()
 	// random value
-	randValAll := make([]string, 0, len(dids))
+	randValAll := make([]string, len(dids))
 	// Blinded DID
-	blindedMsgs := make([]string, 0, len(dids))
+	blindedMsgs := make([]string, len(dids))
 	// the encrypted DID to be stored
-	resBtAll := make([]string, 0, len(dids))
+	resBtAll := make([]string, len(dids))
 	// generate system key
 	sysPk, _ := core.SystemKeygen(pki)
 	// client instance init
 	clt := core.NewClientFromInput(sysPk)
 	// used for verifying
-	var concatVerify string
+	//var concatVerify string
+	var rwLock sync.RWMutex
+	stringChain := make(chan string)
+	count:=0
 
 	// step 1 : blinding
+	start := time.Now()
 	for i, did := range dids {
-		randVal, M, err := clt.Blind(seed, did)
-		fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v err:%v \n", i, randVal, M, seed, did, err)
-		randValAll = append(randValAll, randVal)
-		blindedMsgs = append(blindedMsgs, M)
+		go func(i int,did string, seed uint32,randValAll []string,blindedMsgs []string,stringChain chan string){
+			randVal, M, err := clt.Blind(seed, did)
+			fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v err:%v \n", i, randVal, M, seed, did, err)
+			rwLock.Lock()
+			randValAll[i]=randVal
+			blindedMsgs[i]=M
+			//randValAll = append(randValAll, randVal)
+			//blindedMsgs = append(blindedMsgs, M)
+			rwLock.Unlock()
+			stringChain <- "done"
+		}(i,did,seed,randValAll,blindedMsgs,stringChain)
 	}
+	for count < len(dids) {
+		value := <-stringChain
+		if value == "done" {
+			count++
+		}
+	}
+	elapsed := time.Since(start)
+	fmt.Printf("%d did costs %f ms on Blinding\n", len(dids), float64(elapsed/time.Millisecond))
 
 	// step 2 : ask for ciphers
 	cipherAll, err := callSingleServerEnc(sender, outId, blindedMsgs, destination)
@@ -103,14 +123,21 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	}
 
 	// step 3 : Unblinding
+	start = time.Now()
 	for i, cipher := range cipherAll {
-		bt, _ := clt.Unblind(randValAll[i], []string{cipher})
-		resBtAll = append(resBtAll, bt)
-		concatVerify += bt
+		go func(i int, cipher string, stringChain chan string,resBtAlll []string,randValAll []string){
+			bt, _ := clt.Unblind(randValAll[i], []string{cipher})
+			rwLock.Lock()
+			resBtAll[i]=bt
+			//resBtAll = append(resBtAll, bt)
+			rwLock.Unlock()
+			stringChain <- "done"
+			//concatVerify += bt
+		}(i,cipher,stringChain,resBtAll,randValAll)
 	}
 
 	// step 4 : Verifying, which can be ignored when there is only one media
-	checkResult, r1, _ := clt.Verify([]string{concatVerify}, pki, resBtAll, dids, randValAll)
+	/*checkResult, r1, _ := clt.Verify([]string{concatVerify}, pki, resBtAll, dids, randValAll)
 	if checkResult == 2 {
 		fmt.Println("[Verify] Successful!")
 	} else if checkResult == 0 || checkResult == 1 {
@@ -119,9 +146,17 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	} else {
 		fmt.Printf("[Verify] Error , No.%d media cheat on %dth did!", -checkResult, -r1)
 		return
-	}
+	}*/
 
 	// step 5 : store the mapping relationship
+	count=0
+	for count < len(dids) {
+		value := <-stringChain
+		if value == "done" {
+			count++
+		}
+	}
+	elapsed = time.Since(start)
+	fmt.Printf("%d did costs %f ms on Unblinding\n", len(dids), float64(elapsed/time.Millisecond))
 	storeFunc(dids, resBtAll)
-
 }
