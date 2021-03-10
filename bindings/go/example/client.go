@@ -87,31 +87,21 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	clt := core.NewClientFromInput(sysPk)
 	// used for verifying
 	//var concatVerify string
-	var rwLock sync.RWMutex
-	stringChain := make(chan string)
-	count:=0
+	wg := sync.WaitGroup{}
 
 	// step 1 : blinding
 	start := time.Now()
 	for i, did := range dids {
-		go func(i int,did string, seed uint32,randValAll []string,blindedMsgs []string,stringChain chan string){
+		wg.Add(1)
+		go func(i int,did string){
 			randVal, M, err := clt.Blind(seed, did)
 			fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v err:%v \n", i, randVal, M, seed, did, err)
-			rwLock.Lock()
 			randValAll[i]=randVal
 			blindedMsgs[i]=M
-			//randValAll = append(randValAll, randVal)
-			//blindedMsgs = append(blindedMsgs, M)
-			rwLock.Unlock()
-			stringChain <- "done"
-		}(i,did,seed,randValAll,blindedMsgs,stringChain)
+			wg.Done()
+		}(i,did)
 	}
-	for count < len(dids) {
-		value := <-stringChain
-		if value == "done" {
-			count++
-		}
-	}
+	wg.Wait()
 	elapsed := time.Since(start)
 	fmt.Printf("%d did costs %f ms on Blinding\n", len(dids), float64(elapsed/time.Millisecond))
 
@@ -125,16 +115,17 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	// step 3 : Unblinding
 	start = time.Now()
 	for i, cipher := range cipherAll {
-		go func(i int, cipher string, stringChain chan string,resBtAlll []string,randValAll []string){
+		wg.Add(1)
+		go func(i int,cipher string){
 			bt, _ := clt.Unblind(randValAll[i], []string{cipher})
-			rwLock.Lock()
 			resBtAll[i]=bt
-			//resBtAll = append(resBtAll, bt)
-			rwLock.Unlock()
-			stringChain <- "done"
+			wg.Done()
 			//concatVerify += bt
-		}(i,cipher,stringChain,resBtAll,randValAll)
+		}(i,cipher)
 	}
+	wg.Wait()
+	elapsed = time.Since(start)
+	fmt.Printf("%d did costs %f ms on Unblinding\n", len(dids), float64(elapsed/time.Millisecond))
 
 	// step 4 : Verifying, which can be ignored when there is only one media
 	/*checkResult, r1, _ := clt.Verify([]string{concatVerify}, pki, resBtAll, dids, randValAll)
@@ -149,14 +140,5 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	}*/
 
 	// step 5 : store the mapping relationship
-	count=0
-	for count < len(dids) {
-		value := <-stringChain
-		if value == "done" {
-			count++
-		}
-	}
-	elapsed = time.Since(start)
-	fmt.Printf("%d did costs %f ms on Unblinding\n", len(dids), float64(elapsed/time.Millisecond))
 	storeFunc(dids, resBtAll)
 }
