@@ -15,7 +15,12 @@ ENDIF ()
 SET(SRC_DIR ../../src)
 
 # python header file
-SET(PYTHON_C_FLAGS `python-config --cflags`)
+if (PYTHON2)
+    SET(PYTHON_C_FLAGS `python-config --cflags`)
+else()
+    SET(PYTHON_C_FLAGS `python3-config --cflags`)
+endif()
+
 #set(CMAKE_C_FLAGS_RELEASE $(PYTHON_C_FLAGS))
 #set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} $(PYTHON_C_FLAGS)")
 
@@ -26,9 +31,16 @@ INCLUDE_DIRECTORIES(${SRC_DIR}/psi)
 FILE(GLOB crypto_SRC ${SRC_DIR}/crypto/*.c )
 FILE(GLOB psi_SRC ${SRC_DIR}/psi/*.c )
 
-find_package(PythonLibs 2.7 REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-SET(wrap_SRC ${PROJECT_SOURCE_DIR}/SecureUnionID_wrap.c)
+if (PYTHON2)
+    find_package(PythonLibs 2 REQUIRED)
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    SET(wrap_SRC ${PROJECT_SOURCE_DIR}/SecureUnionID_wrap_py2.c)
+else()
+    find_package(PythonLibs 3 REQUIRED)
+    include_directories(${PYTHON_INCLUDE_DIRS})
+    SET(wrap_SRC ${PROJECT_SOURCE_DIR}/SecureUnionID_wrap_py3.c)
+endif()
+
 
 # output path
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/)

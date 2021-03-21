@@ -2699,6 +2699,7 @@ static swig_module_info swig_module = {swig_types, 2, 0, 0, 0, 0};
 #define SWIG_as_voidptrptr(a) ((void)SWIG_as_voidptr(*a),(void**)(a)) 
 
 
+//#define SWIG_PYTHON_STRICT_BYTE_CHAR // this is for python3. for python2 it should be removed.
 #include "../../src/psi/encryption.h"
 
 
@@ -2838,45 +2839,6 @@ SWIG_From_unsigned_SS_long  (unsigned long value)
 }
 
 
-SWIGINTERNINLINE PyObject *
-SWIG_FromCharPtrAndSize(const char* carray, size_t size)
-{
-  if (carray) {
-    if (size > INT_MAX) {
-      swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
-      return pchar_descriptor ? 
-	SWIG_InternalNewPointerObj((char *)(carray), pchar_descriptor, 0) : SWIG_Py_Void();
-    } else {
-#if PY_VERSION_HEX >= 0x03000000
-#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
-      return PyBytes_FromStringAndSize(carray, (Py_ssize_t)(size));
-#else
-      return PyUnicode_DecodeUTF8(carray, (Py_ssize_t)(size), "surrogateescape");
-#endif
-#else
-      return PyString_FromStringAndSize(carray, (Py_ssize_t)(size));
-#endif
-    }
-  } else {
-    return SWIG_Py_Void();
-  }
-}
-
-
-SWIGINTERNINLINE PyObject * 
-SWIG_FromCharPtr(const char *cptr)
-{ 
-  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
-}
-
-
-SWIGINTERNINLINE PyObject*
-  SWIG_From_int  (int value)
-{
-  return PyInt_FromLong((long) value);
-}
-
-
 SWIGINTERN int
 SWIG_AsVal_double (PyObject *obj, double *val)
 {
@@ -3007,6 +2969,45 @@ SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val)
 }
 
 
+SWIGINTERNINLINE PyObject *
+SWIG_FromCharPtrAndSize(const char* carray, size_t size)
+{
+  if (carray) {
+    if (size > INT_MAX) {
+      swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
+      return pchar_descriptor ? 
+	SWIG_InternalNewPointerObj((char *)(carray), pchar_descriptor, 0) : SWIG_Py_Void();
+    } else {
+#if PY_VERSION_HEX >= 0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+      return PyBytes_FromStringAndSize(carray, (Py_ssize_t)(size));
+#else
+      return PyUnicode_DecodeUTF8(carray, (Py_ssize_t)(size), "surrogateescape");
+#endif
+#else
+      return PyString_FromStringAndSize(carray, (Py_ssize_t)(size));
+#endif
+    }
+  } else {
+    return SWIG_Py_Void();
+  }
+}
+
+
+SWIGINTERNINLINE PyObject * 
+SWIG_FromCharPtr(const char *cptr)
+{ 
+  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
+}
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
+
 #include <limits.h>
 #if !defined(SWIG_NO_LLONG_MAX)
 # if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
@@ -3126,6 +3127,34 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_MasterKeygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  unsigned long arg1 ;
+  char *arg2 = (char *) 0 ;
+  unsigned long val1 ;
+  int ecode1 = 0 ;
+  char temp2[64+1] ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  arg2 = (char *) temp2;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  ecode1 = SWIG_AsVal_unsigned_SS_long(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "MasterKeygen" "', argument " "1"" of type '" "unsigned long""'");
+  } 
+  arg1 = (unsigned long)(val1);
+  result = (int)MasterKeygen(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  arg2[64] = 0;  
+  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_Keygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -3139,9 +3168,9 @@ SWIGINTERN PyObject *_wrap_Keygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  char temp3[1024+1] ;
-  char temp4[1024+1] ;
-  char temp5[1024+1] ;
+  char temp3[66+1] ;
+  char temp4[256+1] ;
+  char temp5[32+1] ;
   PyObject *swig_obj[2] ;
   int result;
   
@@ -3161,11 +3190,11 @@ SWIGINTERN PyObject *_wrap_Keygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args
   arg2 = (char *)(buf2);
   result = (int)Keygen(arg1,arg2,arg3,arg4,arg5);
   resultobj = SWIG_From_int((int)(result));
-  arg3[1024] = 0;  
+  arg3[66] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg3));
-  arg4[1024] = 0;  
+  arg4[256] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg4));
-  arg5[1024] = 0;  
+  arg5[32] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg5));
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
@@ -3173,34 +3202,6 @@ SWIGINTERN PyObject *_wrap_Keygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_MasterKeygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  unsigned long arg1 ;
-  char *arg2 = (char *) 0 ;
-  unsigned long val1 ;
-  int ecode1 = 0 ;
-  char temp2[1024+1] ;
-  PyObject *swig_obj[1] ;
-  int result;
-  
-  arg2 = (char *) temp2;
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  ecode1 = SWIG_AsVal_unsigned_SS_long(swig_obj[0], &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "MasterKeygen" "', argument " "1"" of type '" "unsigned long""'");
-  } 
-  arg1 = (unsigned long)(val1);
-  result = (int)MasterKeygen(arg1,arg2);
-  resultobj = SWIG_From_int((int)(result));
-  arg2[1024] = 0;  
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
-  return resultobj;
-fail:
   return NULL;
 }
 
@@ -3214,8 +3215,8 @@ SWIGINTERN PyObject *_wrap_System_Keygen(PyObject *SWIGUNUSEDPARM(self), PyObjec
   char *arg5 = (char *) 0 ;
   int val3 ;
   int ecode3 = 0 ;
-  char temp4[1024+1] ;
-  char temp5[1024+1] ;
+  char temp4[66+1] ;
+  char temp5[256+1] ;
   PyObject *swig_obj[3] ;
   int result;
   
@@ -3273,9 +3274,9 @@ SWIGINTERN PyObject *_wrap_System_Keygen(PyObject *SWIGUNUSEDPARM(self), PyObjec
   arg3 = (int)(val3);
   result = (int)System_Keygen(arg1,arg2,arg3,arg4,arg5);
   resultobj = SWIG_From_int((int)(result));
-  arg4[1024] = 0;  
+  arg4[66] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg4));
-  arg5[1024] = 0;  
+  arg5[256] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg5));
   {
     free((char *) arg1);
@@ -3306,8 +3307,8 @@ SWIGINTERN PyObject *_wrap_Blinding(PyObject *SWIGUNUSEDPARM(self), PyObject *ar
   int alloc1 = 0 ;
   unsigned long val2 ;
   int ecode2 = 0 ;
-  char temp3[1024+1] ;
-  char temp4[1024+1] ;
+  char temp3[64+1] ;
+  char temp4[66+1] ;
   PyObject *swig_obj[2] ;
   int result;
   
@@ -3326,9 +3327,9 @@ SWIGINTERN PyObject *_wrap_Blinding(PyObject *SWIGUNUSEDPARM(self), PyObject *ar
   arg2 = (unsigned long)(val2);
   result = (int)Blinding(arg1,arg2,arg3,arg4);
   resultobj = SWIG_From_int((int)(result));
-  arg3[1024] = 0;  
+  arg3[64] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg3));
-  arg4[1024] = 0;  
+  arg4[66] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg4));
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   return resultobj;
@@ -3349,7 +3350,7 @@ SWIGINTERN PyObject *_wrap_Enc(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  char temp3[1024+1] ;
+  char temp3[66+1] ;
   PyObject *swig_obj[2] ;
   int result;
   
@@ -3367,7 +3368,7 @@ SWIGINTERN PyObject *_wrap_Enc(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   arg2 = (char *)(buf2);
   result = (int)Enc(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
-  arg3[1024] = 0;  
+  arg3[66] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg3));
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
@@ -3394,7 +3395,7 @@ SWIGINTERN PyObject *_wrap_Unblinding(PyObject *SWIGUNUSEDPARM(self), PyObject *
   int res4 ;
   char *buf4 = 0 ;
   int alloc4 = 0 ;
-  char temp5[1024+1] ;
+  char temp5[66+1] ;
   PyObject *swig_obj[4] ;
   int result;
   
@@ -3439,7 +3440,7 @@ SWIGINTERN PyObject *_wrap_Unblinding(PyObject *SWIGUNUSEDPARM(self), PyObject *
   arg4 = (char *)(buf4);
   result = (int)Unblinding(arg1,arg2,arg3,arg4,arg5);
   resultobj = SWIG_From_int((int)(result));
-  arg5[1024] = 0;  
+  arg5[66] = 0;  
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg5));
   {
     free((char *) arg1);
@@ -3470,12 +3471,13 @@ SWIGINTERN PyObject *_wrap_verify_individual(PyObject *SWIGUNUSEDPARM(self), PyO
   int alloc4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
-  char temp6[1024+1] ;
-  PyObject *swig_obj[5] ;
+  int res6 ;
+  char *buf6 = 0 ;
+  int alloc6 = 0 ;
+  PyObject *swig_obj[6] ;
   int result;
   
-  arg6 = (char *) temp6;
-  if (!SWIG_Python_UnpackTuple(args, "verify_individual", 5, 5, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "verify_individual", 6, 6, swig_obj)) SWIG_fail;
   {
     /* Check if is a list */
     if (PyList_Check(swig_obj[0])) {
@@ -3552,10 +3554,13 @@ SWIGINTERN PyObject *_wrap_verify_individual(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "verify_individual" "', argument " "5"" of type '" "int""'");
   } 
   arg5 = (int)(val5);
+  res6 = SWIG_AsCharPtrAndSize(swig_obj[5], &buf6, NULL, &alloc6);
+  if (!SWIG_IsOK(res6)) {
+    SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "verify_individual" "', argument " "6"" of type '" "char *""'");
+  }
+  arg6 = (char *)(buf6);
   result = (int)verify_individual(arg1,arg2,arg3,arg4,arg5,arg6);
   resultobj = SWIG_From_int((int)(result));
-  arg6[1024] = 0;  
-  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg6));
   {
     free((char *) arg1);
   }
@@ -3566,6 +3571,7 @@ SWIGINTERN PyObject *_wrap_verify_individual(PyObject *SWIGUNUSEDPARM(self), PyO
     free((char *) arg3);
   }
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  if (alloc6 == SWIG_NEWOBJ) free((char*)buf6);
   return resultobj;
 fail:
   {
@@ -3578,6 +3584,7 @@ fail:
     free((char *) arg3);
   }
   if (alloc4 == SWIG_NEWOBJ) free((char*)buf4);
+  if (alloc6 == SWIG_NEWOBJ) free((char*)buf6);
   return NULL;
 }
 
@@ -3677,8 +3684,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "HASHIT", _wrap_HASHIT, METH_VARARGS, NULL},
 	 { "randomSeed", _wrap_randomSeed, METH_NOARGS, NULL},
-	 { "Keygen", _wrap_Keygen, METH_VARARGS, NULL},
 	 { "MasterKeygen", _wrap_MasterKeygen, METH_O, NULL},
+	 { "Keygen", _wrap_Keygen, METH_VARARGS, NULL},
 	 { "System_Keygen", _wrap_System_Keygen, METH_VARARGS, NULL},
 	 { "Blinding", _wrap_Blinding, METH_VARARGS, NULL},
 	 { "Enc", _wrap_Enc, METH_VARARGS, NULL},

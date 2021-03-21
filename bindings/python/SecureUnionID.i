@@ -14,6 +14,7 @@
 
 %module SecureUnionID
 %{
+//#define SWIG_PYTHON_STRICT_BYTE_CHAR // this is for python3. for python2 it should be removed.
 #include "../../src/psi/encryption.h"
 %}
 
@@ -56,32 +57,40 @@ void HASHIT(char *hashstring, char *m);
 unsigned long randomSeed();
     
 // generate master key
-%cstring_bounded_output(char* BYTE, 1024);
-int 
+%cstring_bounded_output(char* outMasterKey, 64);
+%cstring_bounded_output(char* outPublicKeyOfG1, 66);
+%cstring_bounded_output(char* outPublicKeyOfG2, 256);
+%cstring_bounded_output(char* outPrivateKey, 32);
+%cstring_bounded_output(char* outSystemKeyOfG1, 66);
+%cstring_bounded_output(char* outSystemKeyOfG2, 256);
 
-(unsigned long ran, char *BYTE);
-    
-// generate key pairs
-int Keygen(char *masterKey, char *dspid, char *BYTE, char *BYTE, char *BYTE);
+%cstring_bounded_output(char* outBetaValue, 64);
+%cstring_bounded_output(char* outBlindResult, 66);
+%cstring_bounded_output(char* outEncResult, 66);
+%cstring_bounded_output(char* outBlindResult, 66);
+%cstring_bounded_output(char* outUnblindCipherText, 66);
 
 //generate master key
-int MasterKeygen(unsigned long ran, char *BYTE);
+int MasterKeygen(unsigned long ran, char *outMasterKey);
+    
+// generate key pairs
+int Keygen(char *masterKey, char *dspid, char *outPublicKeyOfG1, char *outPublicKeyOfG2, char *outPrivateKey);
     
 // generate system key
-int System_Keygen(char **STRING_ARRAY, char **STRING_ARRAY, int numofmedia, char *BYTE, char *BYTE);
+int System_Keygen(char **STRING_ARRAY, char **STRING_ARRAY, int numofmedia, char *outSystemKeyOfG1, char *outSystemKeyOfG2);
     
 // Blinding for each did
-int Blinding(char *did, unsigned long seed, char *BYTE, char *BYTE);
+int Blinding(char *did, unsigned long seed, char *outBetaValue, char *outBlindResult);
     
 // Encoding for each did
-int Enc(char *skstring, char *Mstring, char *BYTE);
+int Enc(char *skstring, char *Mstring, char *outEncResult);
     
 // Unblinding for each did
-int Unblinding(char **STRING_ARRAY, int numofmedia, char *betastring, char *sysg1string, char *BYTE);
+int Unblinding(char **STRING_ARRAY, int numofmedia, char *betastring, char *sysg1string, char *outUnblindCipherText);
     
 // Verifying bti received from each media
 // btistring represents the different btis received from different media i, pkistring represents different pki of corresponding media i
-int verify_individual(char **STRING_ARRAY, char **STRING_ARRAY, char **STRING_ARRAY, char *did, int numofmedia, char *BYTE);
+int verify_individual(char **STRING_ARRAY, char **STRING_ARRAY, char **STRING_ARRAY, char *did, int numofmedia, char *betastring);
     
 // check whether there are some medias cheating from multiple final unblinded results
 // btstring represents the string which is composed of several results of different dids

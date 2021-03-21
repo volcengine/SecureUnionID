@@ -68,11 +68,11 @@ def HASHIT(hashstring, m):
 def randomSeed():
     return _SecureUnionID.randomSeed()
 
-def Keygen(masterKey, dspid):
-    return _SecureUnionID.Keygen(masterKey, dspid)
-
 def MasterKeygen(ran):
     return _SecureUnionID.MasterKeygen(ran)
+
+def Keygen(masterKey, dspid):
+    return _SecureUnionID.Keygen(masterKey, dspid)
 
 def System_Keygen(arg1, arg2, numofmedia):
     return _SecureUnionID.System_Keygen(arg1, arg2, numofmedia)
@@ -86,8 +86,8 @@ def Enc(skstring, Mstring):
 def Unblinding(STRING_ARRAY, numofmedia, betastring, sysg1string):
     return _SecureUnionID.Unblinding(STRING_ARRAY, numofmedia, betastring, sysg1string)
 
-def verify_individual(arg1, arg2, arg3, did, numofmedia):
-    return _SecureUnionID.verify_individual(arg1, arg2, arg3, did, numofmedia)
+def verify_individual(arg1, arg2, arg3, did, numofmedia, betastring):
+    return _SecureUnionID.verify_individual(arg1, arg2, arg3, did, numofmedia, betastring)
 
 def batch_verify(arg1, arg2, sysg2string, numofdid):
     return _SecureUnionID.batch_verify(arg1, arg2, sysg2string, numofdid)
