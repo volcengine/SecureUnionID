@@ -1,4 +1,4 @@
-**SecureUnionID Pythhon Interface and Usage Description**
+**SecureUnionID Python Interface and Usage Description**
 =======================================
 **Python Interface Description**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
