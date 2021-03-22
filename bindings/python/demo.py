@@ -56,7 +56,9 @@ print("Step 3: blind")
 plaintext = b"123456789012345"
 if (sys.version_info.major == 2):
     plaintext = "123456789012345"
-blind = SecureUnionID.Blinding(plaintext, 1)
+
+r = SecureUnionID.randomSeed()
+blind = SecureUnionID.Blinding(plaintext, r)
 r = blind[0]
 if r != 2:
     print ("blind error, error number: %d" % (r))
