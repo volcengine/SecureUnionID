@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/volcengine/SecureUnionID/bindings/go/core"
@@ -79,8 +80,8 @@ func InitServer(receiver string, skStr string, skv string) {
 	}
 }
 
-func psiEccEncode(ski [core.BIGLENTH]byte, msgs []string) (encodedMsgs []string, err error) {
-	server := core.NewSeverFromInput(ski)
+func psiEccEncode(ski *[core.BIGLENTH]byte, msgs []string) (encodedMsgs []string, err error) {
+	server := core.NewSeverFromInput(*ski)
 	for _, msg := range msgs {
 		resMsg, err := server.Enc(msg)
 		if err != nil {
@@ -92,6 +93,49 @@ func psiEccEncode(ski [core.BIGLENTH]byte, msgs []string) (encodedMsgs []string,
 	return encodedMsgs, nil
 }
 
+func ParallelEncode(sk *[core.BIGLENTH]byte, msgs []string, threadNum int)(encodedMsgs []string,resErr error) {
+	encodedMsgs = make([]string, len(msgs))
+	sever := core.NewSeverFromInput(*sk)
+	totalLen := len(msgs)
+	batchNum := totalLen / threadNum
+	hasInnerErr := false
+	wg := sync.WaitGroup{}
+	for idx := 0; idx < totalLen; idx += batchNum {
+		wg.Add(1)
+		go func(offset int) {
+			defer wg.Done()
+			var err error
+			for i := offset; i < offset+batchNum && i < totalLen; i++ {
+				if hasInnerErr {
+					return
+				}
+				encodedMsgs[i], err = sever.Enc(msgs[i])
+				if err != nil {
+					hasInnerErr = true
+					return
+				}
+			}
+		}(idx)
+	}
+	wg.Wait()
+	if hasInnerErr {
+		return nil, fmt.Errorf("BatchEncode inner error")
+	}
+	return encodedMsgs, nil
+}
+
+func EccPsiEncode(sender string, sk *[core.BIGLENTH]byte, msgs []string) (encodedMsgs []string,err error) {
+	msgLen := len(msgs)
+	if msgLen < 10 {
+		return psiEccEncode(sk, msgs)
+	} else if msgLen <= 100 {
+		return ParallelEncode(sk, msgs, 10)
+	} else {
+		return ParallelEncode(sk, msgs, 100)
+	}
+}
+
+
 func serverEncode(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -102,7 +146,9 @@ func serverEncode(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	resMsgs, err := psiEccEncode(sk, signReq.GetBlindedMessages())
+	fmt.Printf("serverEncode called lenMsgs:%v \n",len(signReq.GetBlindedMessages()))
+	//resMsgs, err := psiEccEncode(sk, signReq.GetBlindedMessages())
+	resMsgs, err := EccPsiEncode(signReq.GetSender(),&sk, signReq.GetBlindedMessages())
 	rspCode := ResponseCode_Success
 	if err != nil {
 		rspCode = ResponseCode_InnerAlgorithmFailed
