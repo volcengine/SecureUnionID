@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/volcengine/SecureUnionID/bindings/go/core"
@@ -146,6 +147,7 @@ func serverEncode(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	t1 := time.Now()
 	fmt.Printf("serverEncode called lenMsgs:%v \n",len(signReq.GetBlindedMessages()))
 	//resMsgs, err := psiEccEncode(sk, signReq.GetBlindedMessages())
 	resMsgs, err := EccPsiEncode(signReq.GetSender(),&sk, signReq.GetBlindedMessages())
@@ -164,7 +166,7 @@ func serverEncode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(rb)
-	fmt.Println("dsp: ", signReq.GetSender(), " called, server success return")
+	fmt.Println("dsp: ", signReq.GetSender(), " called, server success return latency: ",time.Since(t1))
 }
 
 func StartServer() {
