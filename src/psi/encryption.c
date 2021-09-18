@@ -175,6 +175,8 @@ void HASHIT(char *hashstring, char *m)
 /**---------------------------dividing line-----------------------------**/
 
 // generate random seed
+// !This is an example. You can use your own random seed algorithm for security consideration.
+// Each time you use a func that needs a seed, you need to run this func to generate a new seed.
 unsigned long randomSeed() {
     unsigned long seed = 0;
     int fd = open("/dev/urandom", O_RDONLY);
@@ -184,6 +186,7 @@ unsigned long randomSeed() {
     while(seed == 0) {
         read(fd, &seed, sizeof(seed));
     }
+    close(fd);
     return seed;
 }
 
