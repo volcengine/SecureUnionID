@@ -58,6 +58,11 @@ type PSIClientHandler interface {
 	//		 did        device ID
 	// [out]: the randVal used in blinding and the result of blinding
 	Blind(seed uint32, did string) (string, string, error)
+	// client blinding H(did) * randVal
+	// [in]: seed       string
+	//		 did        device ID
+	// [out]: the randVal used in blinding and the result of blinding
+	Blindv2(seed string, did string) (string, string, error)
 	// client unblinding, get Enc(sk, H(did))
 	// [in]: cipheri    the final cipher of did
 	//       randVal    the randVal used in blinding
@@ -121,6 +126,30 @@ func SeedGen() (uint32, error) {
 		return 0, err
 	}
 	return ran, nil
+}
+
+func RandomSeed() ([64]byte, error) {
+	var rand [64]byte
+	randPtr := (*C.char)(unsafe.Pointer(&rand[0]))
+	result := C.genRandSeed(randPtr)
+	if result != 64 {
+		return rand, errors.New("generate random error!\n")
+	}
+	return rand, nil
+}
+
+// generate master key
+// [in]: seed,  the seed of random number
+// [out]: master key
+func GenMasterKey(seed [64]byte) ([64]byte, error) {
+	var masterKey [64]byte
+	keyPtr := (*C.char)(unsafe.Pointer(&masterKey[0]))
+	rndSeed := (*C.char)(unsafe.Pointer(&seed[0]))
+	result := C.genMasterKey(rndSeed, keyPtr)
+	if result != 2 {
+		return masterKey, errors.New("Set para null pointer!\n")
+	}
+	return masterKey, nil
 }
 
 // generate master key
@@ -229,6 +258,29 @@ func (clt *PSIClient) Blind(seed uint32, did string) (string, string, error) {
 	cipherPtr := (*C.char)(unsafe.Pointer(&cipherBuffer[0]))
 
 	result := C.Blinding(didChar, C.ulong(seed), randValPtr, cipherPtr)
+	if result != 2 {
+		return "", "", errors.New("Blinding null pointer!\n")
+	}
+
+	randVal = C.GoString(randValPtr)
+	cipher := C.GoString(cipherPtr)
+	return randVal, cipher, nil
+}
+
+func (clt *PSIClient) Blindv2(seed [64]byte, did string) (string, string, error) {
+	var randVal string
+	didChar := C.CString(did)
+	defer C.free(unsafe.Pointer(didChar))
+
+	seedPtr := (*C.char)(unsafe.Pointer(&seed[0]))
+
+	randValBuffer := make([]byte, 2*BIGLENTH+1)
+	randValPtr := (*C.char)(unsafe.Pointer(&randValBuffer[0]))
+
+	cipherBuffer := make([]byte, 2*G1LENTH+1)
+	cipherPtr := (*C.char)(unsafe.Pointer(&cipherBuffer[0]))
+
+	result := C.Blind(didChar, seedPtr, randValPtr, cipherPtr)
 	if result != 2 {
 		return "", "", errors.New("Blinding null pointer!\n")
 	}

@@ -33,13 +33,13 @@ func main() {
 	did = "123456789012345"
 
 	// Bytedance generates keys.
-	seed, _ := core.SeedGen()
-	masterKeyBT, _ := core.MasterKeyGen(seed)
+	seed, _ := core.RandomSeed()
+	masterKeyBT, _ := core.GenMasterKey(seed)
 	keyPairBT, _ := core.Keygen(masterKeyBT, dspID)
 
 	// Company A generates keys.
-	seed, _ = core.SeedGen()
-	masterKeyTX, _ := core.MasterKeyGen(seed)
+	seed, _ = core.RandomSeed()
+	masterKeyTX, _ := core.GenMasterKey(seed)
 	keyPairTX, _ := core.Keygen(masterKeyTX, dspID)
 
 	// DSP generates the system key.
@@ -54,8 +54,8 @@ func main() {
 	sevTX := core.NewSeverFromInput(keyPairTX.SK)
 
 	// DSP conducts blinding operation.
-	seed, _ = core.SeedGen()
-	randVal, M, _ = clt.Blind(seed, did)
+	seed, _ = core.RandomSeed()
+	randVal, M, _ = clt.Blindv2(seed, did)
 
 	// Bytedance and Company A encrypt received messages.
 	cipherBT, _ := sevBT.Enc(M)
