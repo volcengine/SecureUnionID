@@ -17,19 +17,21 @@
           char Mstring[2*G1LENTH+1], Mstring1[2*G1LENTH+1];
           char cipherstring[2*G1LENTH+1], cipherstring1[2*G1LENTH+1];
           char cipher[2*G1LENTH+1], cipher1[2*G1LENTH+1];
-          unsigned long ran = 0;
+          char ran[64];
           int fd,result;
 
           //生成随机数种子
-          if ((fd = open("/dev/random", O_RDONLY)) > 0)
+          int r = genRandSeed(ran);
+          if (r != 64)
           {
-               read(fd, &ran, sizeof(ran));
+               printf("gen random number error\n");
+               return 0;
           }
 
           //字节生成主密钥和公私钥对
           printf("--------------------------------------------------\n");
           printf("Step 0: generate master key.\n");
-          int r = MasterKeygen(ran,masterkey);
+          r = genMasterKey(ran,masterkey);
           if (r != SUCCESS) {
                printf("generate master key error, error number %d\n", r);
                return 0;
@@ -60,15 +62,24 @@
           //DSP进行盲化
           printf("--------------------------------------------------\n");
           printf("Step 3: blind\n");
-          read(fd, &ran, sizeof(ran));
-          r = Blinding(did,ran,betastring,Mstring);
+          r = genRandSeed(ran);
+          if (r != 64)
+          {
+               printf("gen random number error\n");
+               return 0;
+          }
+          r = Blind(did,ran,betastring,Mstring);
           if (r != SUCCESS) {
                printf("blind error, error number: %d", r);
                return 0;
           }
-          read(fd, &ran, sizeof(ran));
-          close(fd);
-          r = Blinding(did1,ran,betastring1,Mstring1);
+          r = genRandSeed(ran);
+          if (r != 64)
+          {
+               printf("gen random number error\n");
+               return 0;
+          }
+          r = Blind(did1,ran,betastring1,Mstring1);
           if (r != SUCCESS) {
                printf("blind error, error number: %d", r);
                return 0;
@@ -127,4 +138,20 @@
           else{
                printf("no one cheat!\n");
           }
+
+          //验证正确性
+          for(int i=0; i<2; i++)
+          {
+               HASHIT(Mstring, dids[i]);
+               r = Enc(skstring,Mstring,cipherstring);
+               if (r != SUCCESS) {
+                    printf("encrypt error, error number: %d\n", r);
+                    return 0;
+               }
+               if (memcmp(cipherstring, ciphers[i], 2*G1LENTH+1) != 0) {
+                    printf("[did check fail]encrypt != blind + encrypt + unblind\n");
+                    return 0;
+               }
+          }
+          printf("[did check ok] encrypt = blind + encrypt + unblind\n");
      }

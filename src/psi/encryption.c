@@ -190,6 +190,26 @@ unsigned long randomSeed() {
     return seed;
 }
 
+// obtain 512bit random number
+int genRandSeed(char *rnd) {
+    if(!rnd){
+        return NULLPOINTER;
+    }
+    int fd = open("/dev/random", O_RDONLY);
+    if (fd < 0) {
+        return 0;
+    }
+    int ret = 0;
+    while(ret < 60) {
+        ret += read(fd, rnd + ret, 4);
+    }
+    while(ret < 64) {
+        ret += read(fd, rnd + ret, (64 - ret));
+    }
+    close(fd);
+    return ret;
+}
+
 /*int Genpara(char *parag1string, char *parag2string)
 {
     if(!parag1string || !parag2string){
@@ -229,6 +249,26 @@ int MasterKeygen(unsigned long ran, char *masterkey ){
     RAW.val[3] = ran >> 24; // fake random seed source
     for (i = 4; i < 100; i++)
         RAW.val[i] = i;
+    CREATE_CSPRNG(&rng, &RAW); // initialise strong RNG
+
+    for (i = 0; i < 64; i++)
+        masterkey[i] = RAND_byte(&rng);
+    return SUCCESS;
+}
+
+/* generate the master key */
+int genMasterKey(char *rnd, char *masterkey ){
+    int i;
+    char raw[64];
+    csprng rng;
+    octet RAW = {0, sizeof(raw), raw};
+    if(!masterkey || !rnd){
+        return NULLPOINTER;
+    }
+
+    RAW.len = 64; // fake random seed source
+    for (i = 0; i< 64; i++)
+        RAW.val[i] = rnd[i];
     CREATE_CSPRNG(&rng, &RAW); // initialise strong RNG
 
     for (i = 0; i < 64; i++)
@@ -359,6 +399,45 @@ int Blinding(char *did, unsigned long seed, char *betastring, char *Mstring)
     // serialize M
     g1_serialize(M, Mstring);
     return SUCCESS;
+}
+
+//Blinding for each did
+int Blind(char *did, char *seed, char *betastring, char *Mstring)
+{
+    char raw[64];
+    octet RAW = {0, sizeof(raw), raw};
+    ECP_BN254 hashdid;
+    BIG_256_56 q, bigbeta;
+    ECC_para para;
+    ECP_BN254 M;
+    int i;
+    if(!did || !seed|| !betastring || !Mstring){
+        return NULLPOINTER;
+    }
+
+    // generate the random seed.
+    csprng rng;
+    RAW.len = 64; // fake random seed source
+    for (i = 0; i < 64; i++)
+        RAW.val[i] = seed[i];
+    CREATE_CSPRNG(&rng, &RAW); // initialise strong RNG
+
+    // generate the random BIG nummber for blinding
+    BIG_256_56_rcopy(q, CURVE_Order_BN254);
+    BIG_256_56_randomnum(bigbeta, q, &rng);
+    big_serialize(bigbeta, betastring);
+
+    //hashdid=H(did)
+    BN254_HASHIT(&hashdid, did);
+    //M=hashdid*g1^biabeta
+    g1_deserialize(&(para.g1),parag1string);
+    ECP_BN254_copy(&M, &(para.g1));
+    ECP_BN254_mul(&M, bigbeta);
+    ECP_BN254_add(&M, &hashdid);
+
+    // serialize M
+    g1_serialize(M, Mstring);
+    return SUCCESS;   
 }
 
 /* encryption
