@@ -141,6 +141,25 @@ public class SecureUnionID {
     return SecureUnionIDJNI.randomSeed();
   }
 
+  public static int randomSeed(byte[] BYTE) {
+    if (BYTE == null || BYTE.length < MASTER_KEY_LEN)
+      return JAVA_NULL_OR_LENGTH_ERROR;
+    int r = SecureUnionIDJNI.genRandSeed(BYTE);
+    if (r == MASTER_KEY_LEN) return SUCCESS;
+    if (r == 0) return C_NULL_POINTER_ERROR;
+    return r;
+  }
+
+  public static int MasterKeygen(byte[] ran, byte[] BYTE) {
+    if (ran == null || ran.length < MASTER_KEY_LEN)
+    if (BYTE == null || BYTE.length < MASTER_KEY_LEN)
+      return JAVA_NULL_OR_LENGTH_ERROR;
+    int r = SecureUnionIDJNI.genMasterKey(ran, BYTE);
+    if (r == 2) return SUCCESS;
+    if (r == 0) return C_NULL_POINTER_ERROR;
+    return r;
+  }
+
   public static int MasterKeygen(long ran, byte[] BYTE) {
     if (BYTE == null || BYTE.length < MASTER_KEY_LEN)
       return JAVA_NULL_OR_LENGTH_ERROR;
@@ -172,6 +191,18 @@ public class SecureUnionID {
     if (r == 3) return FAIL;
     if (r == 0) return C_NULL_POINTER_ERROR;
     if (r == 1) return C_MALLOC_ERROR;
+    return r;
+  }
+
+  public static int Blind(String did, byte[] seed, byte[] arg2, byte[] arg3) {
+    if (seed == null || seed.length <  MASTER_KEY_LEN ||
+        arg2 == null || arg2.length < (2 * PRIVATE_KEY_LEN + 1) ||
+        arg3 == null || arg3.length < PUBKEY_G1_LEN)
+        return JAVA_NULL_OR_LENGTH_ERROR;
+    int r = SecureUnionIDJNI.Blind(did, seed, arg2, arg3);
+    if (r == 2) return SUCCESS;
+    if (r == 3) return FAIL;
+    if (r == 0) return C_NULL_POINTER_ERROR;
     return r;
   }
 
