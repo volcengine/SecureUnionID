@@ -7,7 +7,13 @@
 
      This interface is used to generate and return a random number seed of unit32 type, which is used for subsequent random number generation.
 
-     Error Return: nil or "file open failure" error or "binary read" error 
+     Error Return: nil or "file open failure" error or "binary read" error
+- **Random Number Seed Generation**
+     **RandomSeed()**
+
+     This interface is used to generate and return a random number seed of [64]byte type, which is used for subsequent random number generation.
+
+     Error Return: nil or "generate random error" error
 - **Master Key Generation**
      **MasterKeyGen(seed)**
 
@@ -17,6 +23,17 @@
           ::
 
                seed: random number seed
+
+     Error Return: nil or "masterkey null pointer" error
+- **Master Key Generation**
+     **GenMasterKey(seed)**
+
+     This interface is used to randomly generate a 512-bit master key, which is used to subsequently derive the corresponding DSP public-private key pair.
+
+     Parameter Description:
+          ::
+
+               seed: random number seed(64 byte)
 
      Error Return: nil or "masterkey null pointer" error
 - **Key Generation**
@@ -61,6 +78,18 @@
             ::
 
               seed:    random number seed
+              did:     the did string to be blinded
+
+     Error Return: nil or "parameter null pointer" error
+- **Blinding**
+     **Blindv2(seed, did)** 
+
+     This interface is used to generate the blinded result of the did and return a random number used for blinding.
+
+     Parameter Description:
+            ::
+
+              seed:    random number seed (64 byte)
               did:     the did string to be blinded
 
      Error Return: nil or "parameter null pointer" error
@@ -128,8 +157,8 @@
             did1 = "123456789054321"
 
             // Bytedance generates keys.
-            seed,_ := core.SeedGen()
-            masterKeyBT,_ := core.MasterKeyGen(seed)
+            seed,_ := core.RandomSeed()
+            masterKeyBT,_ := core.GenMasterKey(seed)
             keyPairBT,_ := core.Keygen(masterKeyBT,dspID)
 
             // DSP generates the system key.
@@ -142,10 +171,10 @@
             sevBT := core.NewSeverFromInput(keyPairBT.SK)
 
             // DSP conducts blinding operation.
-            seed,_ = core.SeedGen()
-            randVal,M,_ = clt.Blind(seed,did)
-            seed,_ = core.SeedGen()  
-            randVal1,M1,_ := clt.Blind(seed,did1)
+            seed,_ = core.RandomSeed()
+            randVal,M,_ = clt.Blindv2(seed,did)
+            seed,_ = core.RandomSeed()  
+            randVal1,M1,_ := clt.Blindv2(seed,did1)
             
             // Bytedance encrypts the received messages.
             cipherBT1,_ := sevBT.Enc(M)
@@ -187,21 +216,21 @@
 ^^^^^^^^^^^^^^
 ::
 
- MasterKeyGen 0.22ms
- Keygen 0.76ms
+ MasterKeyGen 0.28ms
+ Keygen 0.73ms
 
 The following table shows the calculation overhead of each module as the number of media changes, where - means no change. (unit: ms)
 
 +--------------+------+------+------+------+------+------+------+------+
 | numofmedia   | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    |
 +--------------+------+------+------+------+------+------+------+------+
-| SystemKeygen | 0.12 | 0.15 | 0.19 | 0.23 | 0.27 | 0.30 | 0.34 | 0.37 |
+| SystemKeygen | 0.11 | 0.15 | 0.19 | 0.22 | 0.26 | 0.30 | 0.32 | 0.37 |
 +--------------+------+------+------+------+------+------+------+------+
-| Blind        | 0.51 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
+| Blindv2      | 0.61 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
 +--------------+------+------+------+------+------+------+------+------+
 | Enc          | 0.23 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
 +--------------+------+------+------+------+------+------+------+------+
-| Unblind      | 0.30 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
+| Unblind      | 0.29 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
 +--------------+------+------+------+------+------+------+------+------+
 | Verify       | 1.96 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
 +--------------+------+------+------+------+------+------+------+------+
@@ -214,13 +243,13 @@ Here blinding, encryption, and unblinding can be performed in multiple threads, 
 +--------------+------+------+------+------+------+-------+-------+-------+
 | numofdid     | 1    | 10   | 50   | 100  | 150  | 200   | 250   | 300   |
 +--------------+------+------+------+------+------+-------+-------+-------+
-| SystemKeygen | 0.09 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -` | `\ -` | `\ -` |
+| SystemKeygen | 0.11 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -` | `\ -` | `\ -` |
 +--------------+------+------+------+------+------+-------+-------+-------+
-| Blind        | 0.51 | 5.1  | 23.53| 51   | 78.87| 101.82| 127.51| 156.11|
+| Blindv2      | 0.61 | 6.30 | 30.99| 61.67| 92.00| 120.23| 150.57| 185.70|
 +--------------+------+------+------+------+------+-------+-------+-------+
-| Enc          | 0.23 | 2.26 | 11.50| 23.39| 34.62| 45.9  | 57.51 | 69.25 |
+| Enc          | 0.23 | 2.26 | 11.29| 24.00| 34.38| 44.68 | 55.61 | 67.32 |
 +--------------+------+------+------+------+------+-------+-------+-------+
-| Unblind      | 0.30 | 2.8  | 13.68| 27.89| 42.03| 55.05 | 68.16 | 84.15 |
+| Unblind      | 0.29 | 2.94 | 15.03| 30.03| 44.71| 60.01 | 74.20 | 89.56 |
 +--------------+------+------+------+------+------+-------+-------+-------+
-| Verify       | 1.96 | 2.45 | 4.25 | 7    | 9.53 | 11.71 | 14.24 | 17.14 |
+| Verify       | 1.96 | 2.39 | 4.53 | 6.90 | 9.52 | 11.98 | 14.43 | 17.02 |
 +--------------+------+------+------+------+------+-------+-------+-------+
