@@ -29,7 +29,7 @@ import (
 )
 
 func main() {
-	var dspID, did, randVal, M, bt string
+	var dspID, did, randVal, M string
 	dspID = "1234567890"
 	did = "123456789012345"
 
@@ -66,21 +66,6 @@ func main() {
 	var cipheri []string
 	cipheri = append(cipheri, cipherBT)
 	cipheri = append(cipheri, cipherCompanyA)
-	bt, _ = cltBT4dspId.Unblind(randVal, cipheri)
-
-	// Verifying.
-	var cipher []string
-	cipher = append(cipher, bt)
-	var dids []string
-	dids = append(dids, did)
-	var randVals []string
-	randVals = append(randVals, randVal)
-	result, result1, _ := cltBT4dspId.Verify(cipheri, pki, cipher, dids, randVals)
-	if result == 2 {
-		fmt.Println("no one cheat!")
-	} else if result == 0 || result == 1 {
-		fmt.Println("verify error!")
-	} else {
-		fmt.Printf("No.%d media cheat on %dth did!\n", -result, -result1)
-	}
+	_, _ = cltBT4dspId.Unblind(randVal, cipheri)
+	fmt.Println("Complete")
 }

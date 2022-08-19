@@ -159,16 +159,4 @@ func main() {
 		dids = append(dids, did)
 		randVals = append(randVals, randVal)
 	}
-
-	start = time.Now()
-	iterations = 0
-	elapsed = time.Since(start)
-	for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-		clt.Verify(cipheris, pki, cipher, dids, randVals)
-		iterations++
-		elapsed = time.Since(start)
-	}
-	dur = float64(elapsed/time.Millisecond) / float64(iterations)
-	fmt.Printf("Verify - %8d iterations  ", iterations)
-	fmt.Printf(" %8.2f ms per iteration\n", dur)
 }

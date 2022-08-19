@@ -63,7 +63,6 @@ func main() {
 
 	// Bytedance encrypts the received messages.
 	cipherBT1, _ := sevBT.Enc(M)
-	// If you want to test verifying operation, please comment out the next line. 此处模拟字节发送了两个一模一样的密文
 	cipherBT2, _ := sevBT.Enc(M1)
 
 	// DSP unblinds the received ciphers.
@@ -71,14 +70,6 @@ func main() {
 	cipheri = append(cipheri, cipherBT1)
 	bt, _ = clt.Unblind(randVal, cipheri)
 
-	// 二选一
-	// Bytedance cheats on second cipher
-	// cipheri = cipheri[0:0]
-	// cipheri = append(cipheri, cipherBT1)
-	// bt1, _ := clt.Unblind(randVal1, cipheri)
-	// cipheri = cipheri[0:0]
-	// cipheri = append(cipheri, cipherBT1+cipherBT1)
-	// No cheat!
 	cipheri = cipheri[0:0]
 	cipheri = append(cipheri, cipherBT2)
 	bt1, _ := clt.Unblind(randVal1, cipheri)
@@ -89,21 +80,6 @@ func main() {
 	var cipher []string
 	cipher = append(cipher, bt)
 	cipher = append(cipher, bt1)
-	var dids []string
-	dids = append(dids, did)
-	dids = append(dids, did1)
-	var randVals []string
-	randVals = append(randVals, randVal)
-	randVals = append(randVals, randVal1)
-	result, result1, _ := clt.Verify(cipheri, pki, cipher, dids, randVals)
-	if result == 2 {
-		fmt.Println("no one cheat!")
-	} else if result == 0 || result == 1 {
-		fmt.Println("verify error!")
-	} else {
-		fmt.Printf("No.%d media cheat on %dth did!\n", -result, -result1)
-	}
-
 	storeFunc := func(dids []string, msgs []string) {
 		tpl := "did: %s, enc_did: %s"
 		for i := range dids {

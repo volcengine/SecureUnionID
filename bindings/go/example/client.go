@@ -127,18 +127,6 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	elapsed = time.Since(start)
 	fmt.Printf("%d did costs %f ms on Unblinding\n", len(dids), float64(elapsed/time.Millisecond))
 
-	// step 4 : Verifying, which can be ignored when there is only one media
-	/*checkResult, r1, _ := clt.Verify([]string{concatVerify}, pki, resBtAll, dids, randValAll)
-	if checkResult == 2 {
-		fmt.Println("[Verify] Successful!")
-	} else if checkResult == 0 || checkResult == 1 {
-		fmt.Println("[Verify] Error!")
-		return
-	} else {
-		fmt.Printf("[Verify] Error , No.%d media cheat on %dth did!", -checkResult, -r1)
-		return
-	}*/
-
-	// step 5 : store the mapping relationship
+	// step 4 : store the mapping relationship
 	storeFunc(dids, resBtAll)
 }

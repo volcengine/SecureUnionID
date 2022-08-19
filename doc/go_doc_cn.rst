@@ -117,29 +117,6 @@
               cipheri  从各个媒体处收到的对应盲化did的密文
 
      错误返回：nil 或 “参数空指针”错误 或 “分配空间”错误
-- **验证**
-     **Verify(cipheri, pki, cipher, dids, ranVal)**
-
-     该接口用于验证接收到的密文是否正确。
-
-     参数说明：
-            ::
-            
-              cipheri    从各个媒体处收到的一个或多个盲化did的密文连接起来的字符串
-              pki        各个媒体的公钥
-              cipher     多个合并并去盲后的did密文组成的Slice
-              dids       多个did组成的Slice
-              randVal    当时加盲所使用的随机数组成的Slice
-
-     Note：cipheri和pki每一位一一对应，绑定在同一个媒体上；dids和randVal每一位一一对应，randVal存的为dids对应位置加盲时使用的随机数。
-
-     返回参数：int int error 
-
-      第一个参数表示作弊媒体编号的相反数，没作弊时为2，空间出错为1，空指针错误为0
-
-      第二个参数表示作弊DID编号的相反数，没作弊时为2，空间出错为1，空指针错误为0
-
-     错误返回：nil 或 “参数空指针”错误 或 “分配空间”错误
 
 **GO样例**
 ^^^^^^^^^^
@@ -190,25 +167,6 @@
             cipheri = cipheri[0:0]
             cipheri = append(cipheri,cipherBT1+cipherBT2)
 
-            // 验证
-            var cipher []string
-            cipher = append(cipher,bt)
-            cipher = append(cipher,bt1)
-            var dids []string
-            dids = append(dids,did)
-            dids = append(dids,did1)
-            var randVals []string
-            randVals = append(randVals,randVal)
-            randVals = append(randVals,randVal1)
-            result,result1,_ := clt.Verify(cipheri,pki,cipher,dids,randVals)
-            if result == 2 {
-                  fmt.Println("no one cheat!")
-            } else if result == 0 || result == 1 {
-                  fmt.Println("verify error!")
-            } else {
-                  fmt.Printf("No.%d media cheat on %dth did!\n", -result, -result1)
-            }
-
       }
 
 **性能测试**
@@ -231,8 +189,6 @@
 +--------------+------+------+------+------+------+------+------+------+
 | Unblind      | 0.29 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
 +--------------+------+------+------+------+------+------+------+------+
-| Verify       | 1.96 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
-+--------------+------+------+------+------+------+------+------+------+
 
 
 下表为随着DID数变化，各个模块的计算开销，其中-表示不随之变化。（单位ms）
@@ -249,6 +205,4 @@
 | Enc          | 0.23 | 2.26 | 11.29| 24.00| 34.38| 44.68 | 55.61 | 67.32 |
 +--------------+------+------+------+------+------+-------+-------+-------+
 | Unblind      | 0.29 | 2.94 | 15.03| 30.03| 44.71| 60.01 | 74.20 | 89.56 |
-+--------------+------+------+------+------+------+-------+-------+-------+
-| Verify       | 1.96 | 2.39 | 4.53 | 6.90 | 9.52 | 11.98 | 14.43 | 17.02 |
 +--------------+------+------+------+------+------+-------+-------+-------+

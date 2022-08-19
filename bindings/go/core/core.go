@@ -69,17 +69,6 @@ type PSIClientHandler interface {
 	// [out]: the final cipher
 	// Note: cipheri and randVal correspond one to one, please don't input wrong parameters
 	Unblind(randVal string, cipheri []string) (string, error)
-	// client verifying
-	// [in]: cipheri    the slice which consists of encrypted dids by different medias, here the cipher consists of
-	//                  multiple encrypted results of different dids, i.e., C(did)||C(did2)||...
-	//       pki        the public key of each media
-	//       cipher     the slice which consists of multiple final did ciphers
-	//       dids       the slice which consists of multiple dids
-	//       randVal    the slice which consists of multiple randVals
-	// [out]: whether there are media cheating or not
-	// Note: cipheri and pki correspond one to one, and they all bound with a certain DSP, please don't input wrong parameters.
-	// Note: dids and randVal correspond one to one, please don't input wrong parameters.
-	Verify(cipheri []string, pki []Group, cipher []string, dids []string, ranVal []string) (int, error)
 }
 
 type PSIServerHandler interface {
@@ -317,94 +306,6 @@ func (clt *PSIClient) Unblind(randVal string, cipheri []string) (string, error) 
 	cipher := C.GoString(cipherPtr)
 
 	return cipher, nil
-}
-
-func batch_verify(cipher []string, dids []string, sysPk Group) int {
-	cipherPtr := make([](*C.char), 0, len(dids))
-	didsPtr := make([](*C.char), 0, len(dids))
-	for i := 0; i < len(dids); i++ {
-		char1 := C.CString(cipher[i])
-		strptr1 := (*C.char)(unsafe.Pointer(char1))
-		cipherPtr = append(cipherPtr, strptr1)
-		defer C.free(unsafe.Pointer(char1))
-		char2 := C.CString(dids[i])
-		strptr2 := (*C.char)(unsafe.Pointer(char2))
-		didsPtr = append(didsPtr, strptr2)
-		defer C.free(unsafe.Pointer(char2))
-	}
-	sysPkG2Char := C.CString(sysPk.G2)
-	defer C.free(unsafe.Pointer(sysPkG2Char))
-
-	result := C.batch_verify((**C.char)(unsafe.Pointer(&cipherPtr[0])), (**C.char)(unsafe.Pointer(&didsPtr[0])), sysPkG2Char, C.int(len(dids)))
-
-	return int(result)
-}
-
-func individual_verify(cipheri []string, pki []Group, did string, ranVal string, result *int, stringChain chan string) {
-	cipheriPtr := make([](*C.char), 0, len(cipheri))
-	pkiG1sPtr := make([](*C.char), 0, len(cipheri))
-	pkiG2sPtr := make([](*C.char), 0, len(cipheri))
-	for i := 0; i < len(cipheri); i++ {
-		char1 := C.CString(cipheri[i])
-		strptr1 := (*C.char)(unsafe.Pointer(char1))
-		cipheriPtr = append(cipheriPtr, strptr1)
-		defer C.free(unsafe.Pointer(char1))
-		char2 := C.CString(pki[i].G1)
-		strptr2 := (*C.char)(unsafe.Pointer(char2))
-		pkiG1sPtr = append(pkiG1sPtr, strptr2)
-		defer C.free(unsafe.Pointer(char2))
-		char3 := C.CString(pki[i].G2)
-		strptr3 := (*C.char)(unsafe.Pointer(char3))
-		pkiG2sPtr = append(pkiG2sPtr, strptr3)
-		defer C.free(unsafe.Pointer(char3))
-	}
-
-	didChar := C.CString(did)
-	defer C.free(unsafe.Pointer(didChar))
-	ranValChar := C.CString(ranVal)
-	defer C.free(unsafe.Pointer(ranValChar))
-
-	record := C.verify_individual((**C.char)(unsafe.Pointer(&cipheriPtr[0])), (**C.char)(unsafe.Pointer(&pkiG1sPtr[0])), (**C.char)(unsafe.Pointer(&pkiG2sPtr[0])), didChar, C.int(len(cipheri)), ranValChar)
-
-	(*result) = int(record)
-	stringChain <- "done"
-}
-
-func (clt *PSIClient) Verify(cipheri []string, pki []Group, cipher []string, dids []string, ranVal []string) (int, int, error) {
-	result := batch_verify(cipher, dids, clt.sysPk)
-	if result == 0 {
-		return 0, 0, errors.New("Verify null pointer!\n")
-	} else if result == 1 {
-		return 1, 1, errors.New("Verify malloc error!\n")
-	} else if result == 3 {
-		stringChan := make(chan string)
-		result := make([]int, len(dids))
-		for i := 0; i < len(dids); i++ {
-			ciphertemp := make([]string, len(cipheri))
-			for j := 0; j < len(cipheri); j++ {
-				temp := cipheri[j][i*2*G1LENTH : (i+1)*2*G1LENTH]
-				ciphertemp[j] = temp
-			}
-			go individual_verify(ciphertemp, pki, dids[i], ranVal[i], &result[i], stringChan)
-		}
-		count := 0
-		for count < len(dids) {
-			value := <-stringChan
-			if value == "done" {
-				count++
-			}
-		}
-		for i := 0; i < len(dids); i++ {
-			if result[i] == 1 {
-				return result[i], 1, errors.New("Verify malloc error!\n")
-			} else if result[i] == 0 {
-				return result[i], 0, errors.New("Verify null pointer!\n")
-			} else if result[i] < 0 {
-				return result[i], (-(i + 1)), nil
-			}
-		}
-	}
-	return 2, 2, nil
 }
 
 func (sev *PSIServer) Enc(message string) (string, error) {

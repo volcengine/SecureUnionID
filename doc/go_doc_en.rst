@@ -116,30 +116,6 @@
               cipheri:  the blinded did ciphertext received from various media
 
      Error Return: nil or "parameter null pointer" error or "allocation space" error
-- **Verification**
-     **Verify(cipheri, pki, cipher, dids, ranVal)**
-
-     This interface is used to verify whether the received ciphertext is correct.
-
-     Parameter Description:
-            ::
-            
-              cipheri:    a slice which is composed of strings which are the concatenation of one or multiple blinded did ciphertexts received from various media
-              pki:        public key of each media
-              cipher:     a slice composed of multiple merged and unblinded did ciphertexts
-              dids:       a slice composed of multiple did strings
-              randVal:    a slice composed of random numbers used for blinding
-
-     Note：cipheri and pki have a one-to-one correspondence with each digit and are bound to the same medium; dids and randVal have a one-to-one correspondence with each digit, and randVal stores the random number used for blinding the corresponding position of dids.
-
-     Returned Parameters：int int error 
-          ::
-
-           The first parameter represents the opposite number of the cheating medium number, which is 2 when there is no cheating, 1 for space errors, and 0 for null pointer errors.
-
-           The second parameter represents the opposite of the cheating DID number, which is 2 when there is no cheating, 1 for space errors, and 0 for null pointer errors.
-
-     Error Return: nil or "parameter null pointer" error or "allocation space" error
 
 **GO Demo**
 ^^^^^^^^^^^^^
@@ -191,25 +167,6 @@
             cipheri = cipheri[0:0]
             cipheri = append(cipheri,cipherBT1+cipherBT2)
 
-            // Verifying.
-            var cipher []string
-            cipher = append(cipher,bt)
-            cipher = append(cipher,bt1)
-            var dids []string
-            dids = append(dids,did)
-            dids = append(dids,did1)
-            var randVals []string
-            randVals = append(randVals,randVal)
-            randVals = append(randVals,randVal1)
-            result,result1,_ := clt.Verify(cipheri,pki,cipher,dids,randVals)
-            if result == 2 {
-                  fmt.Println("no one cheat!")
-            } else if result == 0 || result == 1 {
-                  fmt.Println("verify error!")
-            } else {
-                  fmt.Printf("No.%d medium cheat on %dth did!\n", -result, -result1)
-            }
-
       }
 
 **Benchmark**
@@ -232,8 +189,6 @@ The following table shows the calculation overhead of each module as the number 
 +--------------+------+------+------+------+------+------+------+------+
 | Unblind      | 0.29 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
 +--------------+------+------+------+------+------+------+------+------+
-| Verify       | 1.96 | `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`| `\ -`|
-+--------------+------+------+------+------+------+------+------+------+
 
 
 The following table shows the calculation overhead of each module as the number of dids changes, where - means no change. (unit: ms)
@@ -250,6 +205,4 @@ Here blinding, encryption, and unblinding can be performed in multiple threads, 
 | Enc          | 0.23 | 2.26 | 11.29| 24.00| 34.38| 44.68 | 55.61 | 67.32 |
 +--------------+------+------+------+------+------+-------+-------+-------+
 | Unblind      | 0.29 | 2.94 | 15.03| 30.03| 44.71| 60.01 | 74.20 | 89.56 |
-+--------------+------+------+------+------+------+-------+-------+-------+
-| Verify       | 1.96 | 2.39 | 4.53 | 6.90 | 9.52 | 11.98 | 14.43 | 17.02 |
 +--------------+------+------+------+------+------+-------+-------+-------+
