@@ -5,6 +5,33 @@
 The interface is implemented in the `SecureUnionID.py`. It calls the low level interface of C language.
 So you should `import SecureUnionID` first
 
+- **Random Number generator**
+      **rnd = SecureUnionID.genRandSeed()**
+
+     This interface is used to generate 64 byte random number.
+
+     Return Result Description:
+            ::
+
+              rnd[0]   length of generated random number（in Byte）
+              rnd[1]   geneated random number
+
+- **Master Key Generation**
+      **masterKey = SecureUnionID.genMasterKey(seed)**
+
+     This interface is used to randomly generate a 512-bit master key.
+
+     Parameter Description:
+            ::
+
+              seed:        random number seed (64 byte)
+     
+     Return Result Description:
+            ::
+
+              masterKey[0]:   success or not, 2 means success; others means failure
+              masterKey[1]:   generated master key
+
 - **Master Key Generation**
       **masterKey = SecureUnionID.MasterKeygen(seed)**
 
@@ -59,6 +86,23 @@ So you should `import SecureUnionID` first
               systemKey[1]:             the system public key of the DSP on group G1
               systemKey[2]:             the system public key of the DSP on group G2
 
+- **Blinding**
+     **blind = SecureUnionID.Blind(deviceId, seed)**
+
+     This interface is used to blind the device identifier using the random seed.
+
+     Parameter Description:
+            ::
+
+              deviceId:           the device identifier to be blinded
+              seed:               the random number seed (64 bytes)
+
+     Return Result Description:
+            ::  
+
+              blind[0]:             success or not, 2 means success; others means failure
+              blind[1]:             the serialized string corresponding to the random number used for blinding
+              blind[2]:             the serialized string corresponding to the blinded result
 
 - **Blinding**
      **blind = SecureUnionID.Blinding(deviceId, seed)**
@@ -175,10 +219,10 @@ So you should `import SecureUnionID` first
 
 
      # generate random seed.
-     r = SecureUnionID.randomSeed()
+     r = SecureUnionID.genRandSeed()
 
      # generate master key.
-     masterKey = SecureUnionID.MasterKeygen(r)
+     masterKey = SecureUnionID.genMasterKey(r[1])
      r = masterKey[0]
      if r != 2:
           print ("generate master key error, error number: %d" % (r))
@@ -225,8 +269,8 @@ So you should `import SecureUnionID` first
      if (sys.version_info.major == 2):
           plaintext = "123456789012345"
 
-     r = SecureUnionID.randomSeed()
-     blind = SecureUnionID.Blinding(plaintext, r)
+     r = SecureUnionID.genRandSeed()
+     blind = SecureUnionID.Blind(plaintext, r[1])
      r = blind[0]
      if r != 2:
           print ("blind error, error number: %d" % (r))
