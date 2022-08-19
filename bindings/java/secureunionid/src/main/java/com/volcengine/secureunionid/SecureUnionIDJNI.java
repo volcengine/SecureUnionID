@@ -8,7 +8,7 @@
 package com.volcengine.secureunionid;
 
 public class SecureUnionIDJNI {
-  public final static native void HASHIT(String jarg1, String jarg2);
+  public final static native void HASHIT(byte[] jarg1, String jarg2);
   public final static native long randomSeed();
   public final static native int genRandSeed(byte[] jarg1);
   public final static native int genMasterKey(byte[] jarg1, byte[] jarg2);

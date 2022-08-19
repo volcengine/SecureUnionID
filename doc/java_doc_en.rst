@@ -45,6 +45,17 @@ System.loadLibrary("SecureUnionID");
 
      Error Return: 0 means success; less than 0 means failure
 
+- **Hash Generation**
+     **HASHIT(byte[] hashstring, String m)**
+
+     This interface is used to convert m into the serialized string hashstring corresponding to the element on the group G1.
+
+     Parameter Description:
+            ::
+
+              m:           the string to be hashed
+              hashstring:  serialized digest
+
 - **Key Generation**
      **int Keygen(byte[] masterKey, String dspId, byte[] publicKeyOfG1, byte[] publicKeyOfG2, byte[] privateKey)**
 

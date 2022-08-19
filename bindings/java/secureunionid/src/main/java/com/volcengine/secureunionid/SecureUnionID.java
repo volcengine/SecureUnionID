@@ -133,7 +133,7 @@ public class SecureUnionID {
   }
 
 
-  public static void HASHIT(String hashstring, String m) {
+  public static void HASHIT(byte[] hashstring, String m) {
     SecureUnionIDJNI.HASHIT(hashstring, m);
   }
 

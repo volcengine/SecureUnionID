@@ -42,6 +42,17 @@ System.loadLibrary("SecureUnionID");
 
       错误返回：0代表成功; 小于0代表失败
 
+- **哈希生成**
+     **HASHIT(hashstring, m)**
+
+     该接口用于将m转换为群G1上的元素对应的序列化字符串hashstring。
+
+     参数说明：
+            ::
+
+              m           需要哈希的字符串
+              hashstring  序列化哈希值
+
 - **密钥生成**
      **int Keygen(byte[] masterKey, String dspId, byte[] publicKeyOfG1, byte[] publicKeyOfG2, byte[] privateKey);**
 
