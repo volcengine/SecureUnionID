@@ -14,6 +14,8 @@
 
 package com.volcengine.secureunionid;
 
+import java.util.Arrays;
+
 class Demo {
     // master key length.
     public static final int MASTER_KEY_LEN = 64;
@@ -90,6 +92,7 @@ class Demo {
         publicKeyOfG2Array[0] = new String(publicKeyOfG2);
         byte systemKeyOfG1[] = new byte[PUBKEY_G1_LEN];
         byte systemKeyOfG2[] = new byte[PUBKEY_G2_LEN];
+        // only make systemKeyOfG1 provied, others should be kept secret !!!
         r = secureUnionID.System_Keygen(publicKeyOfG1Array, publicKeyOfG2Array, 1, systemKeyOfG1, systemKeyOfG2);
         if (r != 0) {
             System.out.printf("generate system key error %d\n", r);
@@ -195,21 +198,18 @@ class Demo {
         String allDeviceIds[] = new String[2];
         allDeviceIds[0] = deviceId0;
         allDeviceIds[1] = deviceId1;
-        // verify
-        r = secureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, 2);
 
-        if (r != 0) {
-            cipherTextArray[0] = new String(cipherText0);
-            int result = secureUnionID.verify_individual(cipherTextArray, publicKeyOfG1Array, publicKeyOfG2Array, deviceId0, 1, betaValue0);
-            if (result != 0) {
-                System.out.println("Cheat on the first device id!\n");
-            }
-            else {
-                System.out.println("Cheat on the second device id!\n");
-            }
+        // directly hash and enc
+        byte hash[] = new byte[PUBKEY_G1_LEN];
+        byte hashCipherText0[] = new byte[PUBKEY_G1_LEN];
+        System.out.println( "-------------------------------------------------");
+        SecureUnionID.HASHIT(hash, deviceId0);
+        r = SecureUnionID.Enc(privateKey, hash, hashCipherText0);
+        if(Arrays.equals(unblindCipherText0, hashCipherText0)) {
+            System.out.println("blind-> enc->unblind = enc");
         }
         else {
-            System.out.println("Success!\n");
+            System.out.println("blind-> enc->unblind != enc");
         }
     }
 }

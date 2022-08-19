@@ -243,28 +243,5 @@ public class SecureUnionID {
     return r;
   }
 
-  public static int verify_individual(String[] arg0, String[] arg1, String[] arg2, String did, int numofmedia, byte[] BYTE) {
-    if (BYTE == null || BYTE.length < (PRIVATE_KEY_LEN * 2 + 1) ||
-        numofmedia < 0 || numofmedia > MAX_MEDIA_NUMBER)
-      return JAVA_NULL_OR_LENGTH_ERROR;
-    int r = SecureUnionIDJNI.verify_individual(arg0, arg1, arg2, did, numofmedia, BYTE);
-    if (r == 2) return SUCCESS;
-    if (r == 3) return FAIL;
-    if (r == 0) return C_NULL_POINTER_ERROR;
-    if (r == 1) return C_MALLOC_ERROR;
-    if (r < 0) return -r;
-    return r;
-  }
-
-  public static int batch_verify(String[] arg0, String[] arg1, byte[] BYTE, int numofdid) {
-    if (BYTE == null || BYTE.length < PUBKEY_G2_LEN)
-      return JAVA_NULL_OR_LENGTH_ERROR;
-    int r = SecureUnionIDJNI.batch_verify(arg0, arg1, BYTE, numofdid);
-    if (r == 2) return SUCCESS;
-    if (r == 3) return FAIL;
-    if (r == 0) return C_NULL_POINTER_ERROR;
-    if (r == 1) return C_MALLOC_ERROR;
-    return r;
-  }
 
 }

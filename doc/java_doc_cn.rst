@@ -145,38 +145,6 @@ System.loadLibrary("SecureUnionID");
 
      错误返回：0代表成功; 小于0代表失败
 
-- **单独验证**
-     **int verify_individual(String[] cipherTextArray, String[] publicKeyOfG1Array, String[] publicKeyOfG2Array, String deviceId, int numofMedia, byte[] betaValue)**
-
-     该接口用于单独验证接收到来自各个媒体方的密文是否正确。
-
-     参数说明：
-            ::
-            
-              cipherTextArray           来自各个媒体方的加密字符串组成的数组
-              publicKeyOfG1Array        所有媒体对应某DSP的在群G1上的公钥
-              publicKeyOfG2Array        所有媒体对应某DSP的在群G2上的公钥
-              deviceId                  设备ID
-              numofMedia                参与的媒体个数
-              betaValue                 当时盲化所用的随机数对应的序列化字符串, 长度为67
-
-     错误返回：0代表验证成功; 其他数值代表校验失败，其中小于0代表内部错误大于0代表作弊媒体编号
-
-- **批量验证**
-     **int batch_verify(String[] unblindCipherArray, String[] allDeviceIds, byte[] systemKeyOfG2, int numofDeviceIds)**
-
-     该接口用于批量验证去盲后的密文是否正确。
-
-     参数说明：
-            ::
-
-              unblindCipherArray   多个去盲后的did密文字符串组成的数组
-              allDeviceIds         多个did字符串组成的数组
-              systemKeyOfG2        对应DSP的在群G2上的系统公钥, 长度为257
-              numofDeviceIds       设备ID的个数
-
-     错误返回：0代表成功; 小于0代表失败
-
 **示例**
 ^^^^^^^^^^
 
@@ -324,29 +292,4 @@ System.loadLibrary("SecureUnionID");
           System.out.printf("unblind result for device id 1: %s\n", bytesToHex(unblindCipherText1));
 
           System.out.println("--------------------------------------------------");
-          System.out.println("Step 6: verify");
-          String unblindCipherArray[] = new String[2];
-          unblindCipherArray[0] = new String(unblindCipherText0);
-          unblindCipherArray[1] = new String(unblindCipherText1);
-
-          String allDeviceIds[] = new String[2];
-          allDeviceIds[0] = deviceId0;
-          allDeviceIds[1] = deviceId1;
-          // verify
-          r = secureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, 2);
-
-          if (r != 0) {
-               cipherTextArray[0] = new String(cipherText0);
-               int result = secureUnionID.verify_individual(cipherTextArray, publicKeyOfG1Array, publicKeyOfG2Array, deviceId0, 1, betaValue0);
-               if (result != 0) {
-                    System.out.println("Cheat on the first device id!\n");
-               }
-               else {
-                    System.out.println("Cheat on the second device id!\n");
-               }
-          }
-          else {
-               System.out.println("Success!\n");
-          }
-       }
     }

@@ -146,38 +146,6 @@ System.loadLibrary("SecureUnionID");
 
      Error Return: 0 means success; less than 0 means failure
 
-- **Individual Verification**
-     **int verify_individual(String[] cipherTextArray, String[] publicKeyOfG1Array, String[] publicKeyOfG2Array, String deviceId, int numofMedia, byte[] betaValue)**
-
-     This interface is used to individually verify whether the ciphertext received from each media party is correct.
-
-     Parameter Description:
-            ::
-            
-              cipherTextArray:            an array of encrypted strings from various media
-              publicKeyOfG1Array          an array of the public keys on group G1 
-              publicKeyOfG2Array          an array of the public keys on group G2
-              deviceId:                   the device identifier
-              numofMedia:                 the number of participating media
-              betaValue:                  the serialized string corresponding to the random number used for blinding
-
-     Error Return: 0 means success; less than 0 means failure; greater than 0 means the cheating media number
-
-- **Batch Verification**
-     **int batch_verify(String[] unblindCipherArray, String[] allDeviceIds, byte[] systemKeyOfG2, int numofDeviceIds)****
-
-     This interface is used to batch verify whether the ciphertext after deblinding is correct.
-
-     Parameter Description:
-            ::
-
-              unblindCipherArray:       an array of multiple unblinded ciphertext strings of device identifiers
-              allDeviceIds:             an array of multiple device identifiers
-              systemKeyOfG2:            the system public key on group G2
-              numofDeviceIds:           the number of device identifiers
-
-     Error Return: 0 means success; less than 0 means failure
-
 
 **example**
 ^^^^^^^^^^
@@ -326,30 +294,4 @@ System.loadLibrary("SecureUnionID");
           }
           System.out.printf("unblind result for device id 1: %s\n", bytesToHex(unblindCipherText1));
 
-          System.out.println("--------------------------------------------------");
-          System.out.println("Step 6: verify");
-          String unblindCipherArray[] = new String[2];
-          unblindCipherArray[0] = new String(unblindCipherText0);
-          unblindCipherArray[1] = new String(unblindCipherText1);
-
-          String allDeviceIds[] = new String[2];
-          allDeviceIds[0] = deviceId0;
-          allDeviceIds[1] = deviceId1;
-          // verify
-          r = secureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, 2);
-
-          if (r != 0) {
-               cipherTextArray[0] = new String(cipherText0);
-               int result = secureUnionID.verify_individual(cipherTextArray, publicKeyOfG1Array, publicKeyOfG2Array, deviceId0, 1, betaValue0);
-               if (result != 0) {
-                    System.out.println("Cheat on the first device id!\n");
-               }
-               else {
-                    System.out.println("Cheat on the second device id!\n");
-               }
-          }
-          else {
-               System.out.println("Success!\n");
-          }
-       }
     }

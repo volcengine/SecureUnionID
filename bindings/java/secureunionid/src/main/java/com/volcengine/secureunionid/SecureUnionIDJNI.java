@@ -19,6 +19,4 @@ public class SecureUnionIDJNI {
   public final static native int Blinding(String jarg1, long jarg2, byte[] jarg3, byte[] jarg4);
   public final static native int Enc(byte[] jarg1, byte[] jarg2, byte[] jarg3);
   public final static native int Unblinding(String[] jarg1, int jarg2, byte[] jarg3, byte[] jarg4, byte[] jarg5);
-  public final static native int verify_individual(String[] jarg1, String[] jarg2, String[] jarg3, String jarg4, int jarg5, byte[] jarg6);
-  public final static native int batch_verify(String[] jarg1, String[] jarg2, byte[] jarg3, int jarg4);
 }
