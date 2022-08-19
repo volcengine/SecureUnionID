@@ -17,7 +17,6 @@ cd bindings/python
 mkdir build
 cd build
 cmake -DPYTHON2=1 ../
-cmake ../
 make
 
 cd ../
