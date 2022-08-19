@@ -159,46 +159,6 @@
                unblindCipherText[0]  表示是否成功(当为2时表示成功，其他数值为失败);
                unblindCipherText[1]  最终的的加密的字符串, 长度为67
 
-
-- **单独验证**
-     **result = SecureUnionID.verify_individual(cipherTextArray, publicKeyOfG1Array, publicKeyOfG2Array, deviceId, numofMedia, betaValue)**
-
-     该接口用于单独验证接收到来自各个媒体方的密文是否正确。
-
-     参数说明：
-            ::
-            
-              cipherTextArray           来自各个媒体方的加密字符串组成的数组
-              publicKeyOfG1Array        所有媒体对应某DSP的在群G1上的公钥
-              publicKeyOfG2Array        所有媒体对应某DSP的在群G2上的公钥
-              deviceId                  设备ID
-              numofMedia                参与的媒体个数
-              betaValue                 当时盲化所用的随机数对应的序列化字符串, 长度为67
-
-     返回结果说明：
-            :: 
-            
-              result                2表示校验成功，其他表示失败
-
-- **批量验证**
-     **result = SecureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, numofDeviceIds)**
-
-     该接口用于批量验证去盲后的密文是否正确。
-
-     参数说明：
-            ::
-
-              unblindCipherArray   多个去盲后的did密文字符串组成的数组
-              allDeviceIds         多个did字符串组成的数组
-              systemKeyOfG2        对应DSP的在群G2上的系统公钥, 长度为257
-              numofDeviceIds       设备ID的个数
-     
-     返回结果说明：
-            :: 
-            
-              result                2表示校验成功，其他表示失败
-
-
 **示例**
 ^^^^^^^^^^
 
@@ -293,15 +253,4 @@
           print ("unbind error, error number: %d" % (r))
           exit(1)
 
-     print("OK")
-
-     unblindCipherArray = [unblind[1]]
-     print("--------------------------------------------------");
-     print("Step 6: verify");
-
-     allDeviceIds = [plaintext]
-     r = SecureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKey[2], 1)
-     if r != 2:
-          print ("verify error, error number: %d" % (r))
-          exit(1)
      print("OK")

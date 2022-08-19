@@ -160,48 +160,6 @@ So you should `import SecureUnionID` first
               unblindCipherText[0]:       success or not, 2 means success; others means failure
               unblindCipherText[1]:       the final encrypted string
 
-
-- **Individual Verification**
-     **result = SecureUnionID.verify_individual(cipherTextArray, publicKeyOfG1Array, publicKeyOfG2Array, deviceId, numofMedia, betaValue)**
-     
-
-     This interface is used to individually verify whether the ciphertext received from each media party is correct.
-
-     Parameter Description:
-            ::
-            
-              cipherTextArray:            an array of encrypted strings from various media
-              publicKeyOfG1Array          an array of the public keys on group G1 
-              publicKeyOfG2Array          an array of the public keys on group G2
-              deviceId:                   the device identifier
-              numofMedia:                 the number of participating media
-              betaValue:                  the serialized string corresponding to the random number used for blinding
-
-      Return Result Description:
-            ::  
-
-              result :       success or not, 2 means success; others means failure
-
-
-- **Batch Verification**
-     **result = SecureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKeyOfG2, numofDeviceIds)**
-
-     This interface is used to batch verify whether the ciphertext after deblinding is correct.
-
-     Parameter Description:
-            ::
-
-              unblindCipherArray:       an array of multiple unblinded ciphertext strings of device identifiers
-              allDeviceIds:             an array of multiple device identifiers
-              systemKeyOfG2:            the system public key on group G2
-              numofDeviceIds:           the number of device identifiers
-
-     Return Result Description:
-            ::  
-
-              result :       success or not, 2 means success; others means failure
-
-
 **example**
 ^^^^^^^^^^
 
@@ -297,15 +255,4 @@ So you should `import SecureUnionID` first
           print ("unbind error, error number: %d" % (r))
           exit(1)
 
-     print("OK")
-
-     unblindCipherArray = [unblind[1]]
-     print("--------------------------------------------------");
-     print("Step 6: verify");
-
-     allDeviceIds = [plaintext]
-     r = SecureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKey[2], 1)
-     if r != 2:
-          print ("verify error, error number: %d" % (r))
-          exit(1)
      print("OK")

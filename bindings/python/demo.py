@@ -90,14 +90,3 @@ if r != 2:
 
 print("OK")
 
-unblindCipherArray = [unblind[1]]
-print("--------------------------------------------------");
-print("Step 6: verify");
-
-allDeviceIds = [plaintext]
-r = SecureUnionID.batch_verify(unblindCipherArray, allDeviceIds, systemKey[2], 1)
-if r != 2:
-    print ("verify error, error number: %d" % (r))
-    exit(1)
-print("OK")
-
