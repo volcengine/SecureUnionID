@@ -140,41 +140,6 @@
 
      Error Return: success or "parameter null pointer" error or "allocation space" error
 
-- **Individual Verification**
-     **verify_individual(btistring, pkig1string, pkig2string, did, numofmedia, betastring)**
-
-     This interface is used to individually verify whether the ciphertext received from each media party is correct.
-
-     Parameter Description:
-            ::
-            
-              btistring:                  an array of encrypted strings from various media
-              pkig1string/pkig2string:    an array of serialized strings corresponding to the public keys of each medium
-              did:                        did plaintext string
-              numofmedia:                 the number of participating media
-              betastring:                 the serialized string corresponding to the random number used for blinding
-
-     Note：btistring和pkig1string/pkig2string每一位一一对应，绑定在同一个媒体上。
-
-     Error Return: success or "parameter null pointer" error or "allocation space" error or the opposite of the cheating media number
-
-- **Batch Verification**
-     **batch_verify(btstring, did, sysg2string, numofdid)**
-
-     This interface is used to batch verify whether the ciphertext after deblinding is correct.
-
-     Parameter Description:
-            ::
-
-              btstring:       an array of multiple unblinded ciphertext strings of dids
-              did:            an array of multiple did strings
-              sysg2string:    the serialized string corresponding to the system public key on G2
-              numofdid:       the number of dids
-
-     Note: There is a one-to-one correspondence between btstring and did.
-
-     Error Return: success or "parameter null pointer" error or "allocation space" error
-
 **C Demo**
 ^^^^^^^^^^^^^
 
@@ -234,19 +199,4 @@
           dids[0] = did;
           dids[1] = did1;
 
-          // Verifying
-          if(batch_verify(ciphers,dids,sysg2string,2) != SUCCESS){
-               cipherstrings[0] = cipherstring;
-               result = verify_individual(cipherstrings,pkig1string,pkig2string,did,1,betastring);
-               if(result<0)
-                    printf("No.%d medium cheat on 1th did!\n",-result);
-
-               cipherstrings[0] = cipherstring1;
-               result = verify_individual(cipherstrings,pkig1string,pkig2string,did1,1,betastring1);
-               if(result<0)
-                    printf("No.%d medium cheat on 2th did!\n",-result);
-          }
-          else{
-               printf("no one cheat!\n");
-          }
      }

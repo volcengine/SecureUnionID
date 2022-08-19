@@ -77,14 +77,6 @@ int Enc(char *skstring, char *Mstring, char *btistring);
 //Unblinding for each did
 int Unblinding(char **btistring, int numofmedia, char *betastring, char *sysg1string,  char *btstring);
 
-//Verifying bti received from each media
-//btistring represents the different btis received from different media i, pkistring represents different pki of corresponding media i
-int verify_individual(char **btistring, char **pkig1string, char **pkig2string, char *did, int numofmedia, char *betastring);
-
-//check whether there are some medias cheating from multiple final unblinded results
-//btstring represents the string which is composed of several results of different dids
-int batch_verify(char **btstring, char **did, char *sysg2string, int numofdid);
-
 int test(char *skstring, char *pkg1, char *pkg2);
 
 #endif

@@ -124,20 +124,6 @@
           //验证
           printf("--------------------------------------------------\n");
           printf("Step 6: verify\n");
-          if(batch_verify(ciphers,dids,sysg2string,2) != SUCCESS){
-               cipherstrings[0] = cipherstring;
-               result = verify_individual(cipherstrings,pkig1string,pkig2string,did,1,betastring);
-               if(result<0)
-                    printf("No.%d media cheat on 1th did!\n",-result);
-
-               cipherstrings[0] = cipherstring1;
-               result = verify_individual(cipherstrings,pkig1string,pkig2string,did1,1,betastring1);
-               if(result<0)
-                    printf("No.%d media cheat on 2th did!\n",-result);
-          }
-          else{
-               printf("no one cheat!\n");
-          }
 
           //验证正确性
           for(int i=0; i<2; i++)

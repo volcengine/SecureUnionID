@@ -140,41 +140,6 @@
 
      错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误
 
-- **单独验证**
-     **verify_individual(btistring, pkig1string, pkig2string, did, numofmedia, betastring)**
-
-     该接口用于单独验证接收到来自各个媒体方的密文是否正确。
-
-     参数说明：
-            ::
-            
-              btistring                  来自各个媒体方的加密字符串组成的数组
-              pkig1string/pkig2string    各个媒体方公钥对应的序列化字符串组成的数组
-              did                        did明文字符串
-              numofmedia                 参与的媒体个数
-              betastring                 当时盲化所用的随机数对应的序列化字符串
-
-     Note：btistring和pkig1string/pkig2string每一位一一对应，绑定在同一个媒体上。
-
-     错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误 或 作弊媒体编号的相反数
-
-- **批量验证**
-     **batch_verify(btstring, did, sysg2string, numofdid)**
-
-     该接口用于批量验证去盲后的密文是否正确。
-
-     参数说明：
-            ::
-
-              btstring       多个去盲后的did密文字符串组成的数组
-              did            多个did字符串组成的数组
-              sysg2string    在G2上的系统公钥对应的序列化字符串
-              numofdid       did的个数
-
-     Note：btstring和did每一位一一对应。
-
-     错误返回：成功 或 “参数空指针”错误 或 “分配空间”错误
-
 **C样例**
 ^^^^^^^^^^
 
@@ -233,19 +198,4 @@
           dids[0] = did;
           dids[1] = did1;
 
-          //验证
-          if(batch_verify(ciphers,dids,sysg2string,2) != SUCCESS){
-               cipherstrings[0] = cipherstring;
-               result = verify_individual(cipherstrings,pkig1string,pkig2string,did,1,betastring);
-               if(result<0)
-                    printf("No.%d media cheat on 1th did!\n",-result);
-
-               cipherstrings[0] = cipherstring1;
-               result = verify_individual(cipherstrings,pkig1string,pkig2string,did1,1,betastring1);
-               if(result<0)
-                    printf("No.%d media cheat on 2th did!\n",-result);
-          }
-          else{
-               printf("no one cheat!\n");
-          }
      }

@@ -50,7 +50,6 @@ SystemKeygen -    87311 iterations       0.11 ms per iteration
 Blindv2 -    16344 iterations       0.61 ms per iteration
 Enc -    43323 iterations       0.23 ms per iteration
 Unblind -    34110 iterations       0.29 ms per iteration
-Verify -     5111 iterations       1.96 ms per iteration
 
 ```
 
