@@ -152,6 +152,7 @@ public class SecureUnionID {
 
   public static int MasterKeygen(byte[] ran, byte[] BYTE) {
     if (ran == null || ran.length < MASTER_KEY_LEN)
+      return JAVA_NULL_OR_LENGTH_ERROR;
     if (BYTE == null || BYTE.length < MASTER_KEY_LEN)
       return JAVA_NULL_OR_LENGTH_ERROR;
     int r = SecureUnionIDJNI.genMasterKey(ran, BYTE);
