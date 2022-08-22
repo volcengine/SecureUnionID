@@ -68,8 +68,14 @@ def HASHIT(hashstring, m):
 def randomSeed():
     return _SecureUnionID.randomSeed()
 
+def genRandSeed():
+    return _SecureUnionID.genRandSeed()
+
 def MasterKeygen(ran):
     return _SecureUnionID.MasterKeygen(ran)
+
+def genMasterKey(rnd):
+    return _SecureUnionID.genMasterKey(rnd)
 
 def Keygen(masterKey, dspid):
     return _SecureUnionID.Keygen(masterKey, dspid)
@@ -79,6 +85,9 @@ def System_Keygen(arg1, arg2, numofmedia):
 
 def Blinding(did, seed):
     return _SecureUnionID.Blinding(did, seed)
+
+def Blind(did, seed):
+    return _SecureUnionID.Blind(did, seed)
 
 def Enc(skstring, Mstring):
     return _SecureUnionID.Enc(skstring, Mstring)

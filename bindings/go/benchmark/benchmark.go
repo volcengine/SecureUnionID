@@ -24,8 +24,8 @@ import (
 const (
 	MIN_TIME   int = 10
 	MIN_ITERS  int = 10
-	NUMOFMEDIA int = 1
-	NUMOFDID   int = 300
+	NUMOFMEDIA int = 2
+	NUMOFDID   int = 1
 )
 
 func main() {
@@ -44,13 +44,13 @@ func main() {
 			iterations := 0
 			elapsed := time.Since(start)
 			for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
-				seed, _ := core.SeedGen()
-				masterKey, _ = core.MasterKeyGen(seed)
+				seed, _ := core.RandomSeed()
+				masterKey, _ = core.GenMasterKey(seed)
 				iterations++
 				elapsed = time.Since(start)
 			}
 			dur := float64(elapsed/time.Millisecond) / float64(iterations)
-			fmt.Printf("MasterKeyGen - %8d iterations  ", iterations)
+			fmt.Printf("GenMasterKey - %8d iterations  ", iterations)
 			fmt.Printf(" %8.2f ms per iteration\n", dur)
 
 			start = time.Now()
@@ -68,8 +68,8 @@ func main() {
 			masterKeys = append(masterKeys, masterKey)
 			KeyPairs = append(KeyPairs, keyPair)
 		} else {
-			seed, _ := core.SeedGen()
-			masterKey, _ := core.MasterKeyGen(seed)
+			seed, _ := core.RandomSeed()
+			masterKey, _ := core.GenMasterKey(seed)
 			keyPair, _ := core.Keygen(masterKey, dspID)
 			masterKeys = append(masterKeys, masterKey)
 			KeyPairs = append(KeyPairs, keyPair)
@@ -104,14 +104,14 @@ func main() {
 	elapsed = time.Since(start)
 	for (int(elapsed/time.Second)) < MIN_TIME || iterations < MIN_ITERS {
 		for i := 0; i < NUMOFDID; i++ {
-			seed, _ := core.SeedGen()
-			randVal, M, _ = clt.Blind(seed, did)
+			seed, _ := core.RandomSeed()
+			randVal, M, _ = clt.Blindv2(seed, did)
 		}
 		iterations++
 		elapsed = time.Since(start)
 	}
 	dur = float64(elapsed/time.Millisecond) / float64(iterations)
-	fmt.Printf("Blind - %8d iterations  ", iterations)
+	fmt.Printf("Blindv2 - %8d iterations  ", iterations)
 	fmt.Printf(" %8.2f ms per iteration\n", dur)
 
 	var cipheris []string

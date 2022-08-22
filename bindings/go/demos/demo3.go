@@ -34,8 +34,8 @@ func main() {
 	did1 = "123456789054321"
 
 	// Bytedance generates keys.
-	seed, _ := core.SeedGen()
-	masterKeyBT, _ := core.MasterKeyGen(seed)
+	seed, _ := core.RandomSeed()
+	masterKeyBT, _ := core.GenMasterKey(seed)
 	keyPairBT, _ := core.Keygen(masterKeyBT, dspID)
 
 	keyPairBT.PK = core.Group{
@@ -54,11 +54,11 @@ func main() {
 	sevBT := core.NewSeverFromInput(keyPairBT.SK)
 
 	// DSP conducts blinding operation.
-	seed, _ = core.SeedGen()
-	randVal, M, _ = clt.Blind(seed, did)
+	seed, _ = core.RandomSeed()
+	randVal, M, _ = clt.Blindv2(seed, did)
 	fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v \n", 0, randVal, M, seed, did)
-	seed, _ = core.SeedGen()
-	randVal1, M1, _ := clt.Blind(seed, did1)
+	seed, _ = core.RandomSeed()
+	randVal1, M1, _ := clt.Blindv2(seed, did1)
 	fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v \n", 1, randVal1, M1, seed, did1)
 
 	// Bytedance encrypts the received messages.

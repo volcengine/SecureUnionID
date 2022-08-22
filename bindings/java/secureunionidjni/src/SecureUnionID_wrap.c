@@ -215,16 +215,15 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
 extern "C" {
 #endif
 
-SWIGEXPORT void JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_HASHIT(JNIEnv *jenv, jclass jcls, jstring jarg1, jstring jarg2) {
+SWIGEXPORT void JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_HASHIT(JNIEnv *jenv, jclass jcls, jbyteArray jarg1, jstring jarg2) {
   char *arg1 = (char *) 0 ;
   char *arg2 = (char *) 0 ;
   
   (void)jenv;
   (void)jcls;
   arg1 = 0;
-  if (jarg1) {
-    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
-    if (!arg1) return ;
+  {
+    arg1 = (char *)(*jenv)->GetByteArrayElements(jenv, jarg1, 0); 
   }
   arg2 = 0;
   if (jarg2) {
@@ -232,7 +231,9 @@ SWIGEXPORT void JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_HASHI
     if (!arg2) return ;
   }
   HASHIT(arg1,arg2);
-  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
+  }
   if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
 }
 
@@ -248,6 +249,46 @@ SWIGEXPORT jlong JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_rand
   return jresult;
 }
 
+SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_genRandSeed(JNIEnv *jenv, jclass jcls, jbyteArray jarg1) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    arg1 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg1, 0); 
+  }
+  result = (int)genRandSeed(arg1);
+  jresult = (jint)result; 
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
+  }
+  
+  return jresult;
+}
+
+SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_genMasterKey(JNIEnv *jenv, jclass jcls, jbyteArray jarg1, jbyteArray jarg2) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    arg1 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg1, 0);
+    arg2 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg2, 0); 
+  }
+  result = (int)genMasterKey(arg1,arg2);
+  jresult = (jint)result; 
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg2, (jbyte *) arg2, 0); 
+  }
+  
+  return jresult;
+}
 
 SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_MasterKeygen(JNIEnv *jenv, jclass jcls, jlong jarg1, jbyteArray jarg2) {
   jint jresult = 0 ;
@@ -582,7 +623,6 @@ SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_Unbli
   return jresult;
 }
 
-
 SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_verify_1individual(JNIEnv *jenv, jclass jcls, jobjectArray jarg1, jobjectArray jarg2, jobjectArray jarg3, jstring jarg4, jint jarg5, jbyteArray jarg6) {
   jint jresult = 0 ;
   char **arg1 = (char **) 0 ;
@@ -833,6 +873,46 @@ SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_batch
   return jresult;
 }
 
+SWIGEXPORT jint JNICALL Java_com_volcengine_secureunionid_SecureUnionIDJNI_Blind(JNIEnv *jenv, jclass jcls, jstring jarg1, jbyteArray jarg2, jbyteArray jarg3, jbyteArray jarg4) {
+  jint jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = 0;
+  if (jarg1) {
+    arg1 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg1, 0);
+    if (!arg1) return 0;
+  }
+  {
+    arg2 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg2, 0);
+  } 
+  {
+    arg3 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg3, 0); 
+  }
+  {
+    arg4 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg4, 0); 
+  }
+  result = (int)Blind(arg1,arg2,arg3,arg4);
+  jresult = (jint)result; 
+    {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg2, (jbyte *) arg2, 0); 
+  }
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg3, (jbyte *) arg3, 0); 
+  }
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg4, (jbyte *) arg4, 0); 
+  }
+  if (arg1) (*jenv)->ReleaseStringUTFChars(jenv, jarg1, (const char *)arg1);
+  
+  
+  return jresult;
+}
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,18 @@
               m           需要哈希的字符串
               hashstring  序列化字符串
 
+- **随机数生成**
+      **genRandSeed(ran)**
+
+      该接口用于生成长度为64字节的随机数。
+
+      参数说明：
+            ::
+
+              ran        生成的随机数
+
+      返回：所生成的随机数长度
+
 - **主密钥生成**
       **MasterKeygen(ran, masterkey)**
 
@@ -22,6 +34,19 @@
             ::
 
               ran        随机数种子
+              masterkey  生成的主密钥
+
+      错误返回：成功 或 “masterkey空指针”错误
+
+- **主密钥生成**
+      **genMasterKey(ran, masterkey)**
+
+      该接口用于随机生成512bit的主密钥，该密钥用于后续派生对应DSP的公私钥对。
+
+      参数说明：
+            ::
+
+              ran        随机数种子(64 byte)
               masterkey  生成的主密钥
 
       错误返回：成功 或 “masterkey空指针”错误
@@ -64,6 +89,21 @@
             ::
 
               seed          随机数种子
+              did           需要盲化的did字符串
+              betastring    盲化随机数对应的序列化字符串
+              Mstring       盲化后结果对应的序列化字符串
+
+     错误返回：成功 或 “参数空指针”错误
+
+- **盲化**
+     **Blind(did, seed, betastring, Mstring)**
+
+     该接口用于生成用于盲化的随机数和did盲化后的结果。
+
+     参数说明：
+            ::
+
+              seed          随机数种子(64 byte)
               did           需要盲化的did字符串
               betastring    盲化随机数对应的序列化字符串
               Mstring       盲化后结果对应的序列化字符串
@@ -157,17 +197,14 @@
           char Mstring[2*G1LENTH+1],Mstring1[2*G1LENTH+1];
           char cipherstring[2*G1LENTH+1],cipherstring1[2*G1LENTH+1];
           char cipher[2*G1LENTH+1],cipher1[2*G1LENTH+1];
-          unsigned long ran = 0;
+          char ran[64];
           int fd,result;
 
           //生成随机数种子
-          if ((fd = open("/dev/random", O_RDONLY)) > 0)
-          {
-               read(fd, &ran, sizeof(ran));
-          }
+          genRandSeed(ran);
 
           //字节生成主密钥和公私钥对
-          MasterKeygen(ran,masterkey);
+          genMasterKey(ran,masterkey);
           Keygen(masterkey,dspID,pkg1string,pkg2string,skstring);
 
           //DSP生成系统参数
@@ -176,11 +213,10 @@
           System_Keygen(pkig1string,pkig2string,1,sysg1string,sysg2string);
 
           //DSP进行盲化
-          read(fd, &ran, sizeof(ran));
-          Blinding(did,ran,betastring,Mstring);
-          read(fd, &ran, sizeof(ran));
-          close(fd);
-          Blinding(did1,ran,betastring1,Mstring1);
+          genRandSeed(ran);
+          Blind(did,ran,betastring,Mstring);
+          genRandSeed(ran);
+          Blind(did1,ran,betastring1,Mstring1);
 
           //字节加密
           Enc(skstring,Mstring,cipherstring);

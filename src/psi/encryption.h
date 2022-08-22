@@ -50,8 +50,14 @@ void HASHIT(char *hashstring, char *m);
 //set system para
 /*void Setpara();*/
 unsigned long randomSeed();
+
+int genRandSeed(char *rnd);
+
 //generate master key
 int MasterKeygen(unsigned long ran, char *masterkey );
+
+//generate master key
+int genMasterKey(char *ran, char *masterkey);
 
 //generate key pairs
 int Keygen(char *masterkey, char *dspid, char *pkg1string, char *pkg2string, char *skstring);
@@ -61,6 +67,9 @@ int System_Keygen(char **pkig1string, char **pkig2string, int numofmedia, char *
 
 //Blinding for each did
 int Blinding(char *did, unsigned long seed, char *betastring, char *Mstring);
+
+//Blinding for each did
+int Blind(char *did, char *seed, char *betastring, char *Mstring);
 
 //Encoding for each did
 int Enc(char *skstring, char *Mstring, char *btistring);

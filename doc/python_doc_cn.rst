@@ -3,6 +3,32 @@
 **Python接口说明**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 接口存在于SecureUnionID.py中, 该类调用底层的C语言的接口，所以需要先`import SecureUnionID`
+- **随机数生成**
+      **rnd = SecureUnionID.genRandSeed()**
+
+      该接口生成长度为64字节的随机数。输出存储到rnd中。
+
+      返回结果说明：
+            ::
+
+              rnd[0]   所生成随机数的长度（in Byte）
+              rnd[1]   生成的随机数, 长度为64
+
+- **主密钥生成**
+      **masterKey = SecureUnionID.genMasterKey(seed)**
+
+      该接口生成主密钥。输入为随机数种子seed, 输出存储到masterKey中。
+
+      参数说明：
+            ::
+
+              seed        随机数种子 (64 byte)
+
+      返回结果说明：
+            ::
+
+              masterKey[0]   表示是否成功(当为2时表示成功，其他数值为失败)
+              masterKey[1]   生成的主密钥, 长度为64
 
 - **主密钥生成**
       **masterKey = SecureUnionID.MasterKeygen(seed)**
@@ -79,6 +105,23 @@
               blind[1]       盲化随机数对应的序列化字符串, 长度为65
               blind[2]       盲化后的结果, 长度为67
 
+- **盲化**
+     **blind = SecureUnionID.Blind(deviceId, seed)**
+
+     该接口用于生成用于盲化的随机数和did盲化后的结果。
+
+     参数说明：
+            ::
+
+              deviceId      需要盲化的did字符串
+              seed          随机数种子，长度为64字节的随机数
+
+     返回结果说明：
+            ::
+
+              blind[0]       表示是否成功(当为2时表示成功，其他数值为失败);     
+              blind[1]       盲化随机数对应的序列化字符串, 长度为65
+              blind[2]       盲化后的结果, 长度为67
 
 - **加密**
      **cipherText = SecureUnionID.Enc(privateKey, plainText)**
@@ -172,10 +215,10 @@
 
 
      # generate random seed.
-     r = SecureUnionID.randomSeed()
+     r = SecureUnionID.genRandSeed()
 
      # generate master key.
-     masterKey = SecureUnionID.MasterKeygen(r)
+     masterKey = SecureUnionID.genMasterKey(r[1])
      r = masterKey[0]
      if r != 2:
           print ("generate master key error, error number: %d" % (r))
@@ -222,8 +265,8 @@
      if (sys.version_info.major == 2):
           plaintext = "123456789012345"
 
-     r = SecureUnionID.randomSeed()
-     blind = SecureUnionID.Blinding(plaintext, r)
+     r = SecureUnionID.genRandSeed()
+     blind = SecureUnionID.Blind(plaintext, r[1])
      r = blind[0]
      if r != 2:
           print ("blind error, error number: %d" % (r))

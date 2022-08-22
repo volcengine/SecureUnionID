@@ -56,7 +56,7 @@ void HASHIT(char *hashstring, char *m);
 // generate random seed
 unsigned long randomSeed();
     
-// generate master key
+%cstring_bounded_output(char* outRnd, 64);
 %cstring_bounded_output(char* outMasterKey, 64);
 %cstring_bounded_output(char* outPublicKeyOfG1, 66);
 %cstring_bounded_output(char* outPublicKeyOfG2, 256);
@@ -70,9 +70,16 @@ unsigned long randomSeed();
 %cstring_bounded_output(char* outBlindResult, 66);
 %cstring_bounded_output(char* outUnblindCipherText, 66);
 
+
+// generate random seed
+int genRandSeed(char *outRnd);
+
 //generate master key
 int MasterKeygen(unsigned long ran, char *outMasterKey);
-    
+
+//generate master key
+int genMasterKey(char *rnd, char *outMasterKey);
+
 // generate key pairs
 int Keygen(char *masterKey, char *dspid, char *outPublicKeyOfG1, char *outPublicKeyOfG2, char *outPrivateKey);
     
@@ -81,7 +88,10 @@ int System_Keygen(char **STRING_ARRAY, char **STRING_ARRAY, int numofmedia, char
     
 // Blinding for each did
 int Blinding(char *did, unsigned long seed, char *outBetaValue, char *outBlindResult);
-    
+
+// Blinding for each did
+int Blind(char *did, char *seed, char *outBetaValue, char *outBlindResult);
+
 // Encoding for each did
 int Enc(char *skstring, char *Mstring, char *outEncResult);
     

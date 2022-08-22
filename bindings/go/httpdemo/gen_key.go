@@ -23,14 +23,14 @@ import (
 
 func main() {
 	dspID := "1234567890"
-	seed, _ := core.SeedGen()
-	masterKeyBT, _ := core.MasterKeyGen(seed)
+	seed, _ := core.RandomSeed()
+	masterKeyBT, _ := core.GenMasterKey(seed)
 	keyPairBT, _ := core.Keygen(masterKeyBT, dspID)
 
 	Sk := example.SkToString(keyPairBT.SK)
 
 	fmt.Println("G1: ", keyPairBT.PK.G1)
 	fmt.Println("G2: ", keyPairBT.PK.G2)
-	fmt.Println("Sk: ", Sk, "len: ", len(Sk))
+	fmt.Println("Sk: ", Sk, "\nlen: ", len(Sk))
 
 }

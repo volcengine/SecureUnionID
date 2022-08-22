@@ -74,7 +74,7 @@ type StoreFunc func(dids []string, vals []string)
 */
 func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destination string, dids []string, storeFunc StoreFunc) {
 	// seed
-	seed, _ := core.SeedGen()
+	seed, _ := core.RandomSeed()
 	// random value
 	randValAll := make([]string, len(dids))
 	// Blinded DID
@@ -94,7 +94,7 @@ func DoSignAndStoreJob(pki []core.Group, sender string, outId string, destinatio
 	for i, did := range dids {
 		wg.Add(1)
 		go func(i int,did string){
-			randVal, M, err := clt.Blind(seed, did)
+			randVal, M, err := clt.Blindv2(seed, did)
 			fmt.Printf("i: %v randVal:%v M: %v seed: %v did: %v err:%v \n", i, randVal, M, seed, did, err)
 			randValAll[i]=randVal
 			blindedMsgs[i]=M

@@ -13,6 +13,18 @@
               m:           the string to be hashed
               hashstring:  serialized string
 
+- **Random Number Generation**
+      **genRandSeed(ran)**
+
+      This interface is used to generate 64 bytes random number.
+
+     Parameter Description:
+            ::
+
+              ran        the generated random number
+
+      Return：the length (in bytes) of generated random number
+
 - **Master Key Generation**
       **MasterKeygen(ran, masterkey)**
 
@@ -22,6 +34,19 @@
             ::
 
               ran:        random number seed
+              masterkey:  generated master key
+
+     Error Return: success or "masterkey null pointer" error
+
+- **Master Key Generation**
+      **genMasterKey(ran, masterkey)**
+
+     This interface is used to randomly generate a 512-bit master key, which is used to subsequently derive the corresponding DSP public-private key pair.
+
+     Parameter Description:
+            ::
+
+              ran:        random number seed (64 byte)
               masterkey:  generated master key
 
      Error Return: success or "masterkey null pointer" error
@@ -64,6 +89,21 @@
             ::
 
               seed:          random number seed
+              did:           the did string to be blinded
+              betastring:    The serialized string corresponding to the random number used for blinding
+              Mstring:       The serialized string corresponding to the blinded result
+
+     Error Return: success or "parameter null pointer" error
+
+- **Blinding**
+     **Blind(did, seed, betastring, Mstring)**
+
+     This interface is used to generate random numbers for blinding and the blinded did.
+
+     Parameter Description:
+            ::
+
+              seed:          random number seed (64 byte)
               did:           the did string to be blinded
               betastring:    The serialized string corresponding to the random number used for blinding
               Mstring:       The serialized string corresponding to the blinded result
@@ -158,17 +198,14 @@
           char Mstring[2*G1LENTH+1],Mstring1[2*G1LENTH+1];
           char cipherstring[2*G1LENTH+1],cipherstring1[2*G1LENTH+1];
           char cipher[2*G1LENTH+1],cipher1[2*G1LENTH+1];
-          unsigned long ran = 0;
+          char ran[64];
           int fd,result;
 
           // Generate random number seed
-          if ((fd = open("/dev/random", O_RDONLY)) > 0)
-          {
-               read(fd, &ran, sizeof(ran));
-          }
+          genRandSeed(ran);
 
           // Bytedance generates keys.
-          MasterKeygen(ran,masterkey);
+          genMasterKey(ran,masterkey);
           Keygen(masterkey,dspID,pkg1string,pkg2string,skstring);
 
           // DSP generates the system key.
@@ -177,11 +214,10 @@
           System_Keygen(pkig1string,pkig2string,1,sysg1string,sysg2string);
 
           // DSP conducts blinding operation.
-          read(fd, &ran, sizeof(ran));
-          Blinding(did,ran,betastring,Mstring);
-          read(fd, &ran, sizeof(ran));
-          close(fd);
-          Blinding(did1,ran,betastring1,Mstring1);
+          genRandSeed(ran);
+          Blind(did,ran,betastring,Mstring);
+          genRandSeed(ran);
+          Blind(did1,ran,betastring1,Mstring1);
 
           // Bytedance encrypts the received messages.
           Enc(skstring,Mstring,cipherstring);

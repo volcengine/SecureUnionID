@@ -42,15 +42,15 @@ Please see the `README.md` under the bindings/java directory.
 
 ## BENCHMARK
 
-We provide a benchmark file for Golang user, the path of which is /bindings/go/benchmark/benchmark.go. The performance on a 2.6 GHz core i7, 16G DDR4 mac with 2 media is as follows: 
+We provide a benchmark file for Golang user, the path of which is /bindings/go/benchmark/benchmark.go. The performance on a 2.3 GHz core i7, 32G DDR4 mac with 2 media is as follows: 
 ```
-MasterKeyGen -    39076 iterations       0.26 ms per iteration
-KeyGen -    13788 iterations       0.73 ms per iteration
-SystemKeygen -    84716 iterations       0.12 ms per iteration
-Blind -    20564 iterations       0.49 ms per iteration
-Enc -    43715 iterations       0.23 ms per iteration
-Unblind -    33308 iterations       0.30 ms per iteration
-Verify -     5071 iterations       1.97 ms per iteration
+GenMasterKey -    35572 iterations       0.28 ms per iteration
+KeyGen -    13785 iterations       0.73 ms per iteration
+SystemKeygen -    87311 iterations       0.11 ms per iteration
+Blindv2 -    16344 iterations       0.61 ms per iteration
+Enc -    43323 iterations       0.23 ms per iteration
+Unblind -    34110 iterations       0.29 ms per iteration
+Verify -     5111 iterations       1.96 ms per iteration
 
 ```
 

@@ -2839,6 +2839,45 @@ SWIG_From_unsigned_SS_long  (unsigned long value)
 }
 
 
+SWIGINTERNINLINE PyObject *
+SWIG_FromCharPtrAndSize(const char* carray, size_t size)
+{
+  if (carray) {
+    if (size > INT_MAX) {
+      swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
+      return pchar_descriptor ? 
+	SWIG_InternalNewPointerObj((char *)(carray), pchar_descriptor, 0) : SWIG_Py_Void();
+    } else {
+#if PY_VERSION_HEX >= 0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+      return PyBytes_FromStringAndSize(carray, (Py_ssize_t)(size));
+#else
+      return PyUnicode_DecodeUTF8(carray, (Py_ssize_t)(size), "surrogateescape");
+#endif
+#else
+      return PyString_FromStringAndSize(carray, (Py_ssize_t)(size));
+#endif
+    }
+  } else {
+    return SWIG_Py_Void();
+  }
+}
+
+
+SWIGINTERNINLINE PyObject * 
+SWIG_FromCharPtr(const char *cptr)
+{ 
+  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
+}
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
+
 SWIGINTERN int
 SWIG_AsVal_double (PyObject *obj, double *val)
 {
@@ -2969,45 +3008,6 @@ SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val)
 }
 
 
-SWIGINTERNINLINE PyObject *
-SWIG_FromCharPtrAndSize(const char* carray, size_t size)
-{
-  if (carray) {
-    if (size > INT_MAX) {
-      swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
-      return pchar_descriptor ? 
-	SWIG_InternalNewPointerObj((char *)(carray), pchar_descriptor, 0) : SWIG_Py_Void();
-    } else {
-#if PY_VERSION_HEX >= 0x03000000
-#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
-      return PyBytes_FromStringAndSize(carray, (Py_ssize_t)(size));
-#else
-      return PyUnicode_DecodeUTF8(carray, (Py_ssize_t)(size), "surrogateescape");
-#endif
-#else
-      return PyString_FromStringAndSize(carray, (Py_ssize_t)(size));
-#endif
-    }
-  } else {
-    return SWIG_Py_Void();
-  }
-}
-
-
-SWIGINTERNINLINE PyObject * 
-SWIG_FromCharPtr(const char *cptr)
-{ 
-  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
-}
-
-
-SWIGINTERNINLINE PyObject*
-  SWIG_From_int  (int value)
-{
-  return PyInt_FromLong((long) value);
-}
-
-
 #include <limits.h>
 #if !defined(SWIG_NO_LLONG_MAX)
 # if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
@@ -3127,6 +3127,24 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_genRandSeed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  char temp1[64+1] ;
+  int result;
+  
+  arg1 = (char *) temp1;
+  if (!SWIG_Python_UnpackTuple(args, "genRandSeed", 0, 0, 0)) SWIG_fail;
+  result = (int)genRandSeed(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  arg1[64] = 0;  
+  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg1));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_MasterKeygen(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   unsigned long arg1 ;
@@ -3151,6 +3169,37 @@ SWIGINTERN PyObject *_wrap_MasterKeygen(PyObject *SWIGUNUSEDPARM(self), PyObject
   resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_genMasterKey(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  char temp2[64+1] ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  arg2 = (char *) temp2;
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_AsCharPtrAndSize(swig_obj[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "genMasterKey" "', argument " "1"" of type '" "char *""'");
+  }
+  arg1 = (char *)(buf1);
+  result = (int)genMasterKey(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  arg2[64] = 0;  
+  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg2));
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   return NULL;
 }
 
@@ -3335,6 +3384,52 @@ SWIGINTERN PyObject *_wrap_Blinding(PyObject *SWIGUNUSEDPARM(self), PyObject *ar
   return resultobj;
 fail:
   if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_Blind(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  char *arg3 = (char *) 0 ;
+  char *arg4 = (char *) 0 ;
+  int res1 ;
+  char *buf1 = 0 ;
+  int alloc1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  char temp3[64+1] ;
+  char temp4[66+1] ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  arg3 = (char *) temp3;
+  arg4 = (char *) temp4;
+  if (!SWIG_Python_UnpackTuple(args, "Blind", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_AsCharPtrAndSize(swig_obj[0], &buf1, NULL, &alloc1);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Blind" "', argument " "1"" of type '" "char *""'");
+  }
+  arg1 = (char *)(buf1);
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Blind" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (int)Blind(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_From_int((int)(result));
+  arg3[64] = 0;  
+  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg3));
+  arg4[66] = 0;  
+  resultobj = SWIG_Python_AppendOutput(resultobj, SWIG_FromCharPtr(arg4));
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -3684,10 +3779,13 @@ static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "HASHIT", _wrap_HASHIT, METH_VARARGS, NULL},
 	 { "randomSeed", _wrap_randomSeed, METH_NOARGS, NULL},
+	 { "genRandSeed", _wrap_genRandSeed, METH_NOARGS, NULL},
 	 { "MasterKeygen", _wrap_MasterKeygen, METH_O, NULL},
+	 { "genMasterKey", _wrap_genMasterKey, METH_O, NULL},
 	 { "Keygen", _wrap_Keygen, METH_VARARGS, NULL},
 	 { "System_Keygen", _wrap_System_Keygen, METH_VARARGS, NULL},
 	 { "Blinding", _wrap_Blinding, METH_VARARGS, NULL},
+	 { "Blind", _wrap_Blind, METH_VARARGS, NULL},
 	 { "Enc", _wrap_Enc, METH_VARARGS, NULL},
 	 { "Unblinding", _wrap_Unblinding, METH_VARARGS, NULL},
 	 { "verify_individual", _wrap_verify_individual, METH_VARARGS, NULL},

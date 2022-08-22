@@ -7,10 +7,13 @@ print("Step 0: generate master key.")
 
 
 # generate random seed.
-r = SecureUnionID.randomSeed()
+r = SecureUnionID.genRandSeed()
+if r[0] !=64:
+    print ("generate random number error, error number: %d" % (r[0]))
+    exit(1)
 
 # generate master key.
-masterKey = SecureUnionID.MasterKeygen(r)
+masterKey = SecureUnionID.genMasterKey(r[1])
 r = masterKey[0]
 if r != 2:
     print ("generate master key error, error number: %d" % (r))
@@ -57,8 +60,8 @@ plaintext = b"123456789012345"
 if (sys.version_info.major == 2):
     plaintext = "123456789012345"
 
-r = SecureUnionID.randomSeed()
-blind = SecureUnionID.Blinding(plaintext, r)
+r = SecureUnionID.genRandSeed()
+blind = SecureUnionID.Blind(plaintext, r[1])
 r = blind[0]
 if r != 2:
     print ("blind error, error number: %d" % (r))
