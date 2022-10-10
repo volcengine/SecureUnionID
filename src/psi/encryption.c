@@ -14,6 +14,12 @@
 
 #include "encryption.h"
 
+#ifdef _WIN32
+#include "windows.h"
+#include "stdio.h"
+#include "Wincrypt.h"
+#endif
+
 char parag1string[]="032523648240000001ba344d80000000086121000000000013a700000000000012";
 char parag2string[]="061a10bb519eb62feb8d8c7e8c61edb6a4648bbb4898bf0d91ee4224c803fb2b0516aaf9ba737833310aa78c5982aa5b1f4d746bae3784b70d8c34c1e7d54cf3021897a06baf93439a90e096698c822329bd0ae6bdbe09bd19f0e07891cd2b9a0ebb2b0e7c8b15268f6d4456f5f38d37b09006ffd739c9578a2d1aec6b3ace9b";
 
@@ -179,6 +185,32 @@ void HASHIT(char *hashstring, char *m)
 // Each time you use a func that needs a seed, you need to run this func to generate a new seed.
 unsigned long randomSeed() {
     unsigned long seed = 0;
+#ifdef _WIN32
+    HCRYPTPROV hCryptProv;
+    LPCSTR UserName = "MyKeyContainer";  // name of the key container
+    if(!CryptAcquireContext(
+            &hCryptProv,               // handle to the CSP
+            UserName,                  // container name
+            NULL,                      // use the default provider
+            PROV_RSA_FULL,             // provider type
+            0))                        // flag values
+    {
+        if(!CryptAcquireContext(
+                &hCryptProv,
+                UserName,
+                NULL,
+                PROV_RSA_FULL,
+                CRYPT_NEWKEYSET))
+            return  0;
+
+    }
+    bool ret = CryptGenRandom(hCryptProv, sizeof(seed), (BYTE *)&seed);
+    CryptReleaseContext(hCryptProv,0);
+    if (!ret)
+        return 0;
+    else
+        return seed;
+#else
     int fd = open("/dev/urandom", O_RDONLY);
     if (fd < 0) {
         return 0;
@@ -188,6 +220,7 @@ unsigned long randomSeed() {
     }
     close(fd);
     return seed;
+#endif
 }
 
 // obtain 512bit random number
@@ -195,6 +228,33 @@ int genRandSeed(char *rnd) {
     if(!rnd){
         return NULLPOINTER;
     }
+#ifdef _WIN32
+    HCRYPTPROV hCryptProv;        // handle for a cryptographic
+    LPCSTR UserName = "MyKeyContainer";  // name of the key container
+    if(!CryptAcquireContext(
+            &hCryptProv,               // handle to the CSP
+            UserName,                  // container name
+            NULL,                      // use the default provider
+            PROV_RSA_FULL,             // provider type
+            0))                        // flag values
+    {
+        if(!CryptAcquireContext(
+                &hCryptProv,
+                UserName,
+                NULL,
+                PROV_RSA_FULL,
+                CRYPT_NEWKEYSET))
+            return  0;
+
+    }
+    bool ret = CryptGenRandom(hCryptProv, 64, (BYTE *)rnd);
+    CryptReleaseContext(hCryptProv,0);
+
+    if (!ret)
+        return 0;
+    else
+        return 64;
+#else
     int fd = open("/dev/random", O_RDONLY);
     if (fd < 0) {
         return 0;
@@ -208,6 +268,7 @@ int genRandSeed(char *rnd) {
     }
     close(fd);
     return ret;
+#endif
 }
 
 /*int Genpara(char *parag1string, char *parag2string)

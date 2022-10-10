@@ -7,7 +7,10 @@
 
 #define CHUNK 64        /**< size of chunk in bits = wordlength of computer = 16, 32 or 64. Note not all curve options are supported on 16-bit processors - see rom.c */
 
+#ifndef _WIN32
 #define byte unsigned char        /**< 8-bit unsigned integer */
+#endif
+
 #define sign32 int            /**< 32-bit signed integer */
 #define sign8 signed char        /**< 8-bit signed integer */
 #define sign16 short int        /**< 16-bit signed integer */
