@@ -195,7 +195,7 @@ int genRandSeed(char *rnd) {
     if(!rnd){
         return NULLPOINTER;
     }
-    int fd = open("/dev/random", O_RDONLY);
+    int fd = open("/dev/urandom", O_RDONLY);
     if (fd < 0) {
         return 0;
     }
